@@ -1,2 +1,2 @@
-# REND
-RISC‑V Energy‑aware Nucleus Design
+# SARV
+SARV A Risc-V
