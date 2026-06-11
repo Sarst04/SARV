@@ -1,2 +1,2 @@
 # SARV
-SARV A Risc-V
+Sarv A Risc-V
