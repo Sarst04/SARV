@@ -61,7 +61,7 @@
 *Measured in gate-level simulation without cache/memory latency. Provides architectural comparison point.*
 
 
-## ✅ Verification
+## Verification
 
 | Test Suite | Status |
 | :--- | :--- |
