@@ -56,8 +56,17 @@
 | Frequency | 550 MHz (simulated) |
 | CoreMark/MHz | 2.61 |
 | Simulation | Gate-level, ideal memory |
+| Flags      | -march=rv32ib_zicond_zmmul_zicsr -mabi=ilp32 -O3 |
 
 *Measured in gate-level simulation without cache/memory latency. Provides architectural comparison point.*
+
+
+## ✅ Verification
+
+| Test Suite | Status |
+| :--- | :--- |
+| CoreMark | Pass |
+| Custom tests |  In progress |
 
 
 ## Synthesis Results
@@ -72,3 +81,10 @@
 | **Cell Count** | 19,417 |
 | **Flip-Flops (DFFR/DFFS)** | 2,161 |
 | **Synthesis Tool** | Yosys |
+
+
+
+##  Author(s)
+
+**Sayyid Amirreza Sayyid Torabi**  
+[sayyidtorabi@gmail.com](mailto:sayyidtorabi@gmail.com)
