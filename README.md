@@ -7,18 +7,54 @@
 
 ---
 
-## ✨ Features
+## ✅ ISA Support
 
-| Feature | Support |
-| :--- | :--- |
-| **Base ISA** | RV32I |
-| **Compressed** | C (16-bit instructions) |
-| **Bit Manipulation** | B (Zba, Zbb, Zbs) |
-| **Integer Multiplication** | Zmmul  |
-| **Conditional Operations** | Zicond |
-| **Control Status Registers** | Zicsr |
-| **Performance Counters** | Zihpm |
-| **Pause Hint** | Zihintpause |
-| **Interrupts** | Machine Timer, Machine External, Machine Software |
+| Extension | Description | Status |
+| :--- | :--- | :--- |
+| **RV32I** | Base Integer Instructions |  Full |
+| **Zmmul** | Integer Multiplication (no division) |  Full |
+| **Zicond** | Conditional Operations |  Full |
+| **Zihintpause** | Pause Hint Instruction |  Full |
+
+### Compressed Instructions (C)
+
+| Sub-extension | Description | Status |
+| :--- | :--- | :--- |
+| Zca | Integer Compressed |  Full |
+
+### Bit Manipulation (B)
+
+| Sub-extension | Description | Status |
+| :--- | :--- | :--- |
+| Zba | Address Generation |  Full |
+| Zbb | Basic Bit-Manipulation |  Full |
+| Zbs | Single-Bit Operations |  Full |
+
+### Control & Status
+
+| Extension | Description | Status |
+| :--- | :--- | :--- |
+| **Zicsr** | Control Status Registers |  Full |
+| **Zihpm** | Hardware Performance Monitors |  Full |
+
+### Interrupts
+
+| Type | Description | Status |
+| :--- | :--- | :--- |
+| MEI | Machine External Interrupt | Supported |
+| MTI | Machine Timer Interrupt | Supported |
+| MSI | Machine Software Interrupt | Supported |
 
 ---
+
+
+##  CoreMark Performance
+
+| Metric | Value |
+| :--- | :--- |
+| CoreMark | 1499 |
+| Frequency | 575 MHz (simulated) |
+| CoreMark/MHz | 2.61 |
+| Simulation | Gate-level, ideal memory |
+
+*Measured in gate-level simulation without cache/memory latency. Provides architectural comparison point.*
