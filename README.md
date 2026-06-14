@@ -7,7 +7,7 @@
 
 ---
 
-## ✅ ISA Support
+##  ISA Support
 
 | Extension | Description | Status |
 | :--- | :--- | :--- |
@@ -52,9 +52,23 @@
 
 | Metric | Value |
 | :--- | :--- |
-| CoreMark | 1499 |
-| Frequency | 575 MHz (simulated) |
+| CoreMark | 1433.87 |
+| Frequency | 550 MHz (simulated) |
 | CoreMark/MHz | 2.61 |
 | Simulation | Gate-level, ideal memory |
 
 *Measured in gate-level simulation without cache/memory latency. Provides architectural comparison point.*
+
+
+## Synthesis Results
+
+### Technology: Nangate 45nm Open Cell Library
+
+| Metric | Value |
+| :--- | :--- |
+| **Total Area** | 28,472 µm² |
+| **Sequential Area** | 11,395 µm² (40.0%) |
+| **Combinational Area** | ~17,077 µm² (60.0%) |
+| **Cell Count** | 19,417 |
+| **Flip-Flops (DFFR/DFFS)** | 2,161 |
+| **Synthesis Tool** | Yosys |
