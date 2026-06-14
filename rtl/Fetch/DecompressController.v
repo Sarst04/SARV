@@ -1,8 +1,0 @@
-module decompress_controller(
-	input  wire [31:0]	instruction_F_i,
-	output wire			compressedFlag
-);
-
-	assign 	compressedFlag	=	~(instruction_F_i[1:0]	==	2'b11);
-
-endmodule
