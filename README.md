@@ -45,6 +45,12 @@
 | MTI | Machine Timer Interrupt | Supported |
 | MSI | Machine Software Interrupt | Supported |
 
+### Power Management
+
+| Feature | Description | Status |
+| :--- | :--- | :--- |
+| **WFI** | Wait for Interrupt — halts core until IRQ |  Supported |
+
 ---
 
 
