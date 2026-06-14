@@ -81,10 +81,3 @@
 | **Cell Count** | 19,417 |
 | **Flip-Flops (DFFR/DFFS)** | 2,161 |
 | **Synthesis Tool** | Yosys |
-
-
-
-##  Author(s)
-
-**Sayyid Amirreza Sayyid Torabi**  
-[sayyidtorabi@gmail.com](mailto:sayyidtorabi@gmail.com)
