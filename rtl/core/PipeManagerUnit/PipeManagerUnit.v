@@ -73,19 +73,19 @@ module pipe_manager_unit (
 
 
 	wire   	loadWordStall			= memRead_E & ( (rs1Add_D == rd_E) | (rs2Add_D == rd_E) );
+	wire	multiplyStall			= ( (rs1Add_D == rd_E) | (rs2Add_D == rd_E)  ) & mulEn_X1_i;
 	assign 	disablePCAdder_F_i		= coldDownPipe_C_o;
-	wire   	fullPipeStall			= stallPipe_C_o & (~(jumpOrBranch | cleanPipe_C_o | coldDownPipe_C_o | loadWordStall | pauseCore_E_o));
+	wire   	fullPipeStall			= stallPipe_C_o ;
 	assign 	disableLoadStore 		= fullPipeStall;
 	assign 	disableInstructionLoad	= fullPipeStall;
-	wire	multiplyStall			= ( (rs1Add_D == rd_E) | (rs2Add_D == rd_E)  ) & mulEn_X1_i;
 
 	wire   pauseCore				= pauseCore_E_o & (~coldDownPipe_C_o);
 
 	assign clear_F 					= 1'b0;
-	assign clear_D 					= jumpOrBranch	| cleanPipe_C_o | coldDownPipe_C_o | waitRequest_F_o;
-	assign clear_EC 				= jumpOrBranch  | cleanPipe_C_o | loadWordStall | multiplyStall ;
-	assign clear_MX 				= pauseCore;
-	assign clear_W 					= waitRequest_M_o;
+	assign clear_D 					= (jumpOrBranch	| cleanPipe_C_o | coldDownPipe_C_o | waitRequest_F_o) & (~fullPipeStall);
+	assign clear_EC 				= (jumpOrBranch  | cleanPipe_C_o | loadWordStall | multiplyStall ) & (~fullPipeStall);
+	assign clear_MX 				= (pauseCore)& (~fullPipeStall);
+	assign clear_W 					= (waitRequest_M_o)& (~fullPipeStall);
 
 	assign stall_F 					= loadWordStall | fullPipeStall   | waitRequest_M_o | waitRequest_F_o | pauseCore | multiplyStall;
 	assign stall_D 					= loadWordStall | fullPipeStall   | waitRequest_M_o | 					pauseCore | multiplyStall;
