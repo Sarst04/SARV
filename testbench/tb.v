@@ -31,23 +31,16 @@ module tb;
 		#100_000_000;
 		$stop;
     end
-	always @(posedge clk) begin
-		if (riscV.instructionMem.dataOut1 === 32'bx) begin
-			$display("x data");
-			$stop;
-		end
-	end
 	`define UART_ADDR 32'h1000_0000
 	always @(posedge clk) begin
-		if (riscV.MemoryWriteRequest && riscV.MemoryAddress == `UART_ADDR) begin
-            $write("%c",riscV.MemoryWriteData);
+		if (soc.MemoryWriteRequest && soc.MemoryAddress == `UART_ADDR) begin
+            $write("%c",soc.MemoryWriteData);
         
 		end
 	end
 	`define SIMEND_ADDR 32'h2000_0000
 	always @(posedge clk) begin
-		if (riscV.MemoryWriteRequest && riscV.MemoryAddress == `SIMEND_ADDR) begin
-
+		if (soc.MemoryWriteRequest && soc.MemoryAddress == `SIMEND_ADDR) begin
             $write("\n Simulation Ended by Writing in End Address\n");
         	$stop;
 		end
