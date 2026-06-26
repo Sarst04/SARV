@@ -81,9 +81,10 @@
 
 | Metric | Value |
 | :--- | :--- |
-| **Total Area** | 28,472 µm² |
-| **Sequential Area** | 11,395 µm² (40.0%) |
-| **Combinational Area** | ~17,077 µm² (60.0%) |
-| **Cell Count** | 19,417 |
-| **Flip-Flops (DFFR/DFFS)** | 2,161 |
+| **Total Area** | 30.320 µm² |
+| **Sequential Area** | 11.416 µm² (38.0%) |
+| **Combinational Area** | 18.904 µm² (62.0%) |
+| **Cell Count** | 22,139 |
+| **KGE** | 11.4 kGE |
+| **Flip-Flops (DFFR/DFFS)** | 2,146 |
 | **Synthesis Tool** | Yosys |
