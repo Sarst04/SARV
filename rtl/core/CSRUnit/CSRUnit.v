@@ -161,6 +161,7 @@ module CSR_unit#(
 	CSR_inter_interrupt_controller	CSRinterInterruptController (
 		.clk(clk),
 		.rst(rst),
+
 		.mip(mipData),
 		.mie(mieData),
 		.mstatusMIE(mstatusData[3]),

@@ -16,9 +16,9 @@ module SARV_Core #(
 	input  wire		   MSI,
 	
 	output wire [31:0] instructionMemoryAddress,
+	output wire 	   instructionMemoryReadRequest,
 	input  wire [31:0] instructionMemoryData,
-	output wire		   instructionMemoryWaitRequest,
-	output wire		   instructionMemoryReadRequest,
+	input  wire		   instructionMemoryWaitRequest,
 
 	output wire [31:0] memoryAddress,
 	output wire [31:0] memoryWriteData,
@@ -26,7 +26,7 @@ module SARV_Core #(
 	output wire [ 1:0] memoryAccessType,
 	output wire 	   memoryWriteRequest,
 	output wire 	   memoryReadRequest,
-	output wire		   memoryWaitRequest
+	input  wire		   memoryWaitRequest
 
 );
 
@@ -45,11 +45,12 @@ module SARV_Core #(
 	// Control signal
 	wire		instMemWaitRequest_F_i;
 	wire		disablePCAdder_F_i;
-	wire		disableInstructionLoad_F_i;
 
 	wire		instCountEn_F_o;
 	wire		instMemWaitRequest_F_o;
 	wire		stageSignalValid_F_o;
+	wire		instructionMemoryReadRequest_F_o;
+
 	// Data signal
 	wire [31:0] PC_F_i;
 	wire [31:0] instructionMemoryData_F_i;
@@ -139,8 +140,6 @@ module SARV_Core #(
 	wire [31:0] rs2Data_E_o;
 	wire [ 4:0] rd_E_o;
 	wire [31:0] rs1Data_E_o;
-
-
 
 	// Multipication
 	// Control signal
@@ -251,26 +250,19 @@ module SARV_Core #(
 	wire 		stall_MX;
 	wire 		stall_W;
 	wire		stallStatus;
-	wire		disableLoadStore_M_i;
 
 	// CSR Unit
 	// Control signal
-	wire [ 2:0]	funct3_C_i;
 	wire		system_C_i;
 	wire		instCountEn_C_i;
 	wire [ 3:0]	pmCounterEn_C_i;
 
 	wire		stallPipe_C_o;
-	wire		Jump_C_o;
-	wire		PCSrc_C_o_A_i;
-	wire		changePCSrc_C_o;
 	wire		changeExeSrc_C_o;
 	wire		cleanPipe_C_o;
 
 	// Data signal
 	wire [31:0] rs1Data_C_i;
-	wire [ 4:0] rdAddr_C_i;
-	wire [ 4:0] uimm_C_i;
 	wire [11:0] funct12_C_i;
 
 	wire [31:0] rdData_C_o;
@@ -303,8 +295,6 @@ module SARV_Core #(
 		.stageDEMWValid(stageDEMWValid),
 		.pauseCore_E_o(pauseCore_E_o),
 
-		.disableLoadStore(disableLoadStore_M_i),
-		.disableInstructionLoad(disableInstructionLoad_F_i),
 		.disablePCAdder_F_i(disablePCAdder_F_i),
 		.clear_F(clear_F),
 		.stall_F(stall_F),
@@ -361,7 +351,6 @@ module SARV_Core #(
 		.stall_F_i(stall_F),
 		.instMemWaitRequest_F_i(instMemWaitRequest_F_i),
 		.disablePCAdder_F_i(disablePCAdder_F_i),
-		.disableInstructionLoad_F_i(disableInstructionLoad_F_i),
 
 		.instCountEn_F_o(instCountEn_F_o),
 		.instMemWaitRequest_F_o(instMemWaitRequest_F_o),
@@ -581,7 +570,6 @@ module SARV_Core #(
 		.funct3_M_i(funct3_M_i),
 		.waitRequest_M_i(waitRequest_M_i),
 		.stageSignalValid_M_i(stageSignalValid_M_i),
-		.disableLoadStore_M_i(disableLoadStore_M_i),
 
 		.instCountEn_M_o(instCountEn_M_o),
 		.memWrite_M_o(memWrite_M_o),
@@ -725,9 +713,9 @@ module SARV_Core #(
 	assign instCountEn_C_i				= instCountEn_W_o;
 	
 	assign instructionMemoryAddress 	= instructionMemoryAddress_F_o;
+	assign instructionMemoryReadRequest = instructionMemoryReadRequest_F_o;
 	assign instructionMemoryData_F_i	= instructionMemoryData;
 	assign instMemWaitRequest_F_i		= instructionMemoryWaitRequest;
-	assign instructionMemoryReadRequest	= instructionMemoryReadRequest_F_o;
 
 	assign memoryAddress 				= memAddress_M_o;
 	assign memoryWriteData 				= memDataIn_M_o;

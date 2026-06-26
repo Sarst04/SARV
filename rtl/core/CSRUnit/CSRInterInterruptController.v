@@ -9,10 +9,10 @@ module CSR_inter_interrupt_controller(
     input wire 		    clk,
     input wire 		    rst,
 
-	input  wire [31:0]	mip,
-	input  wire [31:0]  mie,
-	input  wire 		mstatusMIE,
-	input  wire			stageDEMWValid,
+	input wire [31:0]	mip,
+	input wire [31:0]  	mie,
+	input wire 			mstatusMIE,
+	input wire			stageDEMWValid,
 
 	output reg			coldDownPipe,
 	output reg			raiseInterrupt,

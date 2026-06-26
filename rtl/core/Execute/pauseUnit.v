@@ -35,7 +35,6 @@ module pause_unit(
 					ns = PAUSE;
 			end
 			PAUSE 	: begin
-				//$display("\n[pause] Time: %0t ns", $time);
 				if (carryOut | (~pauseReq))
 					ns = ACTIVE;
 			end

@@ -92,6 +92,8 @@ module CSR_unit#(
 	wire 		mhpmcounter6En;
 	wire [31:0] mhpmcounter7Data;
 	wire 		mhpmcounter7En;
+	wire [31:0] mhpmcounter8Data;
+	wire 		mhpmcounter8En;
 	wire 		minstretEn;
 	wire [31:0] minstretData;
 	wire 		minstrethEn;
@@ -159,6 +161,8 @@ module CSR_unit#(
 	CSR_inter_interrupt_controller	CSRinterInterruptController (
 		.clk(clk),
 		.rst(rst),
+
+		.fsmEn(1'b1),
 		.mip(mipData),
 		.mie(mieData),
 		.mstatusMIE(mstatusData[3]),
@@ -236,6 +240,7 @@ module CSR_unit#(
 		.mhpmcounter5En(mhpmcounter5En),
 		.mhpmcounter6En(mhpmcounter6En),
 		.mhpmcounter7En(mhpmcounter7En),
+		.mhpmcounter8En(mhpmcounter8En),
 		.mcountinhibitEn(mcountinhibitEn),
 		.mcpirateEn(mcpirateEn),
 		.mcpictrlEn(mcpictrlEn)
@@ -425,6 +430,17 @@ module CSR_unit#(
 		.dataOut(mhpmcounter7Data)
 
 	);
+	CSR_counter	#(MHPM_COUNTER_SIZE) mhpmcounter8(
+    	.clk(clk),
+		.rst(rst),
+
+		.en(mhpmcounter8En),
+		.ce(pmCounterEn_C_i[3]),
+		.stall(mcountinhibitData[8]),
+		.dataIn(CSRWtiteData),
+		.dataOut(mhpmcounter8Data)
+
+	);
 
 	CSR_read_unit CSRReadUnit(
 		.CSRAddr(CSRAddr),
@@ -454,6 +470,7 @@ module CSR_unit#(
 		.mhpmcounter5Data(mhpmcounter5Data),
 		.mhpmcounter6Data(mhpmcounter6Data),
 		.mhpmcounter7Data(mhpmcounter7Data),
+		.mhpmcounter8Data(mhpmcounter8Data),
 		.mcountinhibitData(mcountinhibitData),
 
 		.mcpirateData(mcpirateData),

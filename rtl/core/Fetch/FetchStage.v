@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // File      : FetchStage.v
 // Author(s) : Sayyid Amirreza Sayyid Torabi <sayyidtorabi@gmail.com>
-// Date      : 2026-05-19 (last modified)
+// Date      : 2026-06-22 (last modified)
 // Description:
 //   
 ////////////////////////////////////////////////////////////////////////////////
@@ -13,7 +13,6 @@ module fetch_stage (
 	input  wire		   	stall_F_i,
 	input  wire			instMemWaitRequest_F_i,
 	input  wire			disablePCAdder_F_i,
-	input  wire			disableInstructionLoad_F_i,
 	
 	output wire			instCountEn_F_o,
 	output wire			instMemWaitRequest_F_o,
@@ -47,14 +46,13 @@ module fetch_stage (
 	assign	PCAdderInB		= (disablePCAdder_F_i == 0) ? PCStep			: 32'd0;
 	
 	instruction_load_unit InstructionLoadUnit(
-		.disableInstructionLoad_F_i(disableInstructionLoad_F_i),
 		.waitRequest_F_i(instMemWaitRequest_F_i),
-		.instructionMemoryReadRequest_F_o(instructionMemoryReadRequest_F_o),
 		.waitRequest_F_o(instMemWaitRequest_F_o),
 		.PC_F_i(PC_F_i),
 		.instructionMemoryData_F_i(instructionMemoryData_F_i),
 		.instructionMemoryAddress_F_o(instructionMemoryAddress_F_o),
-		.instructionMemoryData(instructionMemoryData)
+		.instructionMemoryData(instructionMemoryData),
+		.instructionMemoryReadRequest_F_o(instructionMemoryReadRequest_F_o)
 	);
 
 	decompress_controller DecompressController(

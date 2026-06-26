@@ -19,13 +19,12 @@ module memory_stage (
 	input  wire  [ 2:0] funct3_M_i,
 	input  wire			waitRequest_M_i,
 	input  wire		    stageSignalValid_M_i,
-	input  wire			disableLoadStore_M_i,
 
 	output wire		  	instCountEn_M_o,
 	output wire 	    memWrite_M_o,
 	output wire 	    memRead_M_o,
 	output wire 	    regWrite_M_o,
-	output  wire  [ 1:0] writeBackSrcSelect_M_o,
+	output  wire [ 1:0] writeBackSrcSelect_M_o,
 	output wire			waitRequest_M_o,
 	output wire	 [ 1:0] memAccessType_M_o,
 	output wire		    stageSignalValid_M_o,
@@ -62,7 +61,6 @@ module memory_stage (
 		.memWrite_M_i(memWrite_M_i),
 		.waitRequest_M_i(waitRequest_M_i),
 		.funct3_M_i(funct3_M_i),
-		.disableLoadStore_M_i(disableLoadStore_M_i),
 
 		.memRead_M_o(memRead_M_o),
 		.memWrite_M_o(memWrite_M_o),
