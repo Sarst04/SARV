@@ -55,13 +55,16 @@ module SOC(
 	SARV_Core Core(
     	.clk(clk),
 		.rst(rst),
+
 		.MEI(MEI),
 		.MTI(MTI),
 		.MSI(MSI),
+
 		.instructionMemoryAddress(instructionMemoryAddress),
+		.instructionMemoryReadRequest(instructionMemoryReadRequest),
 		.instructionMemoryData(instructionMemoryData),
 		.instructionMemoryWaitRequest(instructionMemoryWaitRequest),
-		.instructionMemoryReadRequest(instructionMemoryReadRequest),
+
 		.memoryAddress(MemoryAddress),
 		.memoryWriteData(MemoryWriteData),
 		.memoryAccessType(MemoryAccessType),
@@ -70,24 +73,32 @@ module SOC(
 		.memoryReadData(MemoryReadData),
 		.memoryWaitRequest(MemoryWaitRequest)
 	);
-	assign	instructionMemoryWaitRequest	=	1'b0;
 
-	instruction_memory #(INSTRUCTION_MEMORY_END_ADDR - INSTRUCTION_MEMORY_BASE_ADDR) instructionMem(
+	instructionMemoryModel #(INSTRUCTION_MEMORY_END_ADDR - INSTRUCTION_MEMORY_BASE_ADDR) instructionMem(
     	.clk(clk),
 		.rst(rst),
-		.addr1(instructionMemoryAddress),
-		.dataOut1(instructionMemoryData),
-		.accessType(MemoryAccessType),
-		.addr2(MemoryAddress - INSTRUCTION_MEMORY_BASE_ADDR),
-		.dataOut2(instructionMemoryReadData)
+
+		.readRequestA(instructionMemoryReadRequest),
+		.addrA(instructionMemoryAddress - INSTRUCTION_MEMORY_BASE_ADDR),
+		.dataOutA(instructionMemoryData),
+		.accessTypeA(2'b10),
+		.waitRequestA(instructionMemoryWaitRequest),
+
+		.readRequestB(MemoryReadRequest),
+		.addrB(MemoryAddress - INSTRUCTION_MEMORY_BASE_ADDR),
+		.dataOutB(instructionMemoryReadData),
+		.accessTypeB(MemoryAccessType),
+		.waitRequestB()
 	);
 
-	data_memory #(DATA_MEMORY_END_ADDR - DATA_MEMORY_BASE_ADDR) DataMem(
+	dataMemoryModel #(DATA_MEMORY_END_ADDR - DATA_MEMORY_BASE_ADDR) DataMem(
     	.clk(clk),
 		.rst(rst),
+
 		.readRequest(MemoryReadRequest),
 		.writeRequest(MemoryWriteRequest),
 		.chipSelect(dataMemorySelect),
+
 		.accessType(MemoryAccessType),
 		.address(MemoryAddress - DATA_MEMORY_BASE_ADDR),
 		.dataIn(MemoryWriteData),

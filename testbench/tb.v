@@ -12,12 +12,10 @@ module tb;
 		.MSI(MSI)
 	);
 
-	integer clkCount = 0;
     initial begin
         clk = 0;
         forever begin
             #1 clk = ~clk;
-			clkCount	=	clkCount +1;
         end
     end
 
@@ -25,18 +23,23 @@ module tb;
         	rst = 1;
 			MEI = 0;
 	 		MSI = 0;
-        #20 rst = 0; clkCount = 0;
+        #20 rst = 0;
+		#400_000;
+        $stop;
 		#400_000;
         $stop;
 		#100_000_000;
 		$stop;
     end
-	`define UART_ADDR 32'h1000_0000
 	always @(posedge clk) begin
-		if (soc.MemoryWriteRequest && soc.MemoryAddress == `UART_ADDR) begin
-            $write("%c",soc.MemoryWriteData);
-        
+		if (soc.instructionMem.dataOutA === 32'bx) begin
+			$display("x data");
+			$stop;
 		end
+	end
+	`define UART_ADDR 32'h1000_0000
+	always @(soc.MemoryWriteRequest && soc.MemoryAddress == `UART_ADDR) begin
+    	$write("%c",soc.MemoryWriteData);
 	end
 	`define SIMEND_ADDR 32'h2000_0000
 	always @(posedge clk) begin
