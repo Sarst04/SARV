@@ -3,7 +3,9 @@
   <img src="docs/assets/logo.png" alt="SARV32 Core Logo" width="800">
 </p>
 
-**SARV** is a 32-bit RISC-V core implementation supporting the RV32I base integer instruction set with multiple extensions. Designed for embedded systems.
+**SARV** is a 32-bit RISC-V processor implementing the RV32I base ISA together with selected standard extensions including Bit Manipulation (B), Compressed Instructions (C), Zmmul, Zicond, and Zicsr.
+
+The core is written in Verilog HDL and targets FPGA and ASIC implementations. It is designed as a compact embedded processor with a modular RTL architecture.
 
 ---
 
@@ -88,3 +90,14 @@
 | **KGE** | 11.4 kGE |
 | **Flip-Flops (DFFR/DFFS)** | 2,146 |
 | **Synthesis Tool** | Yosys |
+|**Post-synthesis estimated Fmax** | 550 MHz |
+
+## Architecture
+
+The figure below shows the top level organization of the SARV core. Detailed down to wire and module documentation are available in the `docs/` directory.
+
+<p align="center">
+  <img src="docs/assets/schematicBigPicture.svg"
+       alt="SARV Architecture"
+       width="900">
+</p>
