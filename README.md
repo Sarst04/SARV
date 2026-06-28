@@ -9,6 +9,10 @@ The core is written in Verilog HDL and targets FPGA and ASIC implementations. It
 
 ---
 
+## Documentation
+- [Critical Path](docs/criticalPath.md#critical-path)
+
+
 ##  ISA Support
 
 | Extension | Description | Status |
