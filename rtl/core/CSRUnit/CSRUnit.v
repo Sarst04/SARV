@@ -21,7 +21,8 @@ module CSR_unit#(
 	input  wire 		systemInst_C_i,
 	input  wire		    instCountEn_C_i,
 	input  wire			stageDEMWValid_C_i,
-	input  wire	[ 3:0]	pmCounterEn_C_i,
+	input  wire	[ 4:0]	pmCounterEn_C_i,
+	input  wire			instructionMemoryWaitRequest_C_i,
 
 	output wire			cleanPipe_C_o,
 	output wire 		stallPipe_C_o,
@@ -94,6 +95,8 @@ module CSR_unit#(
 	wire 		mhpmcounter7En;
 	wire [31:0] mhpmcounter8Data;
 	wire 		mhpmcounter8En;
+	wire [31:0] mhpmcounter9Data;
+	wire 		mhpmcounter9En;
 	wire 		minstretEn;
 	wire [31:0] minstretData;
 	wire 		minstrethEn;
@@ -208,9 +211,13 @@ module CSR_unit#(
  	CSR_CPI_manager CPIManagerUnit(
     	.clk(clk),
 		.rst(rst),
+
 		.priv(2'b0),
 		.CPIRate(mcpirateData),
 		.CPICTRL(mcpictrlData),
+		.instructionMemoryWaitRequest(instructionMemoryWaitRequest_C_i),
+
+
 		.stallCore(stallPipeCPIUnit)
 	);
 
@@ -240,6 +247,7 @@ module CSR_unit#(
 		.mhpmcounter6En(mhpmcounter6En),
 		.mhpmcounter7En(mhpmcounter7En),
 		.mhpmcounter8En(mhpmcounter8En),
+		.mhpmcounter9En(mhpmcounter9En),
 		.mcountinhibitEn(mcountinhibitEn),
 		.mcpirateEn(mcpirateEn),
 		.mcpictrlEn(mcpictrlEn)
@@ -440,6 +448,18 @@ module CSR_unit#(
 		.dataOut(mhpmcounter8Data)
 
 	);
+	CSR_counter	#(MHPM_COUNTER_SIZE) mhpmcounter9(
+    	.clk(clk),
+		.rst(rst),
+
+		.en(mhpmcounter9En),
+		.ce(pmCounterEn_C_i[4]),
+		.stall(mcountinhibitData[9]),
+		.dataIn(CSRWtiteData),
+		.dataOut(mhpmcounter9Data)
+
+	);
+
 
 	CSR_read_unit CSRReadUnit(
 		.CSRAddr(CSRAddr),
@@ -470,6 +490,7 @@ module CSR_unit#(
 		.mhpmcounter6Data(mhpmcounter6Data),
 		.mhpmcounter7Data(mhpmcounter7Data),
 		.mhpmcounter8Data(mhpmcounter8Data),
+		.mhpmcounter9Data(mhpmcounter9Data),
 		.mcountinhibitData(mcountinhibitData),
 
 		.mcpirateData(mcpirateData),

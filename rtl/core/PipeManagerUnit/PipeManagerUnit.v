@@ -73,9 +73,8 @@ module pipe_manager_unit (
 	wire   	loadWordStall			= memRead_E & ( (rs1Add_D == rd_E) | (rs2Add_D == rd_E) );
 	wire	multiplyStall			= ( (rs1Add_D == rd_E) | (rs2Add_D == rd_E)  ) & mulEn_X1_i;
 	assign 	disablePCAdder_F_i		= coldDownPipe_C_o | waitRequest_F_o;
+	wire    pauseCore				= pauseCore_E_o & (~coldDownPipe_C_o);
 	wire   	fullPipeStall			= stallPipe_C_o;
-
-	wire   pauseCore				= pauseCore_E_o & (~coldDownPipe_C_o);
 
 	assign clear_F 					= 1'b0;
 	assign clear_D 					= (jumpOrBranch	| cleanPipe_C_o | coldDownPipe_C_o | waitRequest_F_o) 	& (~fullPipeStall) & (~waitRequest_M_o);

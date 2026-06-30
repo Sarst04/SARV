@@ -108,9 +108,10 @@ All CSR addresses follow the standard 12-bit CSR encoding.
 | mhpmcounter6   | 0xB06   | Performance counter 6 |
 | mhpmcounter7   | 0xB07   | Performance counter 7 |
 | mhpmcounter8   | 0xB08   | Performance counter 8 |
+| mhpmcounter9   | 0xB08   | Performance counter 9 |
 | mcountinhibit  | 0x320   | Counter enable control |
 
-> **Note:** The width of the hardware performance counters (`mhpmcounter3`–`mhpmcounter8`) is configurable through the `MHPM_COUNTER_SIZE` parameter and can be selected at synthesis time.
+> **Note:** The width of the hardware performance counters (`mhpmcounter3`–`mhpmcounter9`) is configurable through the `MHPM_COUNTER_SIZE` parameter and can be selected at synthesis time.
 
 ---
 

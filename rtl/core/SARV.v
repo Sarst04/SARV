@@ -255,7 +255,8 @@ module SARV_Core #(
 	// Control signal
 	wire		system_C_i;
 	wire		instCountEn_C_i;
-	wire [ 3:0]	pmCounterEn_C_i;
+	wire [ 4:0]	pmCounterEn_C_i;
+	wire		instructionMemoryWaitRequest_C_i;
 
 	wire		stallPipe_C_o;
 	wire		changeExeSrc_C_o;
@@ -276,6 +277,8 @@ module SARV_Core #(
 	wire		loadStore;
 	wire		changePCSrc;
 	wire		multiply;
+	wire		regWrite;
+
 
  	pipe_manager_unit Pipe_Manager(
 		.clk(clk),
@@ -507,7 +510,7 @@ module SARV_Core #(
 
 	assign rs1Data_C_i		=	rs1Data_E_o;
 
-	assign pmCounterEn_C_i	=	{multiply, changePCSrc, stallStatus, loadStore};
+	assign pmCounterEn_C_i	=	{regWrite, multiply, changePCSrc, stallStatus, loadStore};
 
 	CSR_unit #(.HART_ID(HART_ID)) CSR(
 		.clk(clk),
@@ -527,6 +530,7 @@ module SARV_Core #(
 		.changeExeSrc_C_o(changeExeSrc_C_o),
 		.cleanPipe_C_o(cleanPipe_C_o),
 		.pmCounterEn_C_i(pmCounterEn_C_i),
+		.instructionMemoryWaitRequest_C_i(instructionMemoryWaitRequest_C_i),
 		
 		.PC_E_o_C_i(PC_E_i),
 		.PC_A_o_C_i(selectedPC_A_o),
@@ -642,6 +646,7 @@ module SARV_Core #(
 
 	assign	stageDEMWValid	=	stageDEMValid	|	stageSignalValid_W_i;	
 
+	assign	regWrite		= regWrite_W_i & (~stall_W);
 	writeBack_stage WriteBack(
 		.clk(clk),
 		.rst(rst),
@@ -706,22 +711,23 @@ module SARV_Core #(
 
 		.mulResult_X2_o(mulResult_X2_o)
 	);
-	assign mulResult_S_i				= mulResult_X2_o;
-	assign multiply						= mulEn_X1_i & (~stall_EC);
+	assign mulResult_S_i					= mulResult_X2_o;
+	assign multiply							= mulEn_X1_i & (~stall_EC);
 
 	
-	assign instCountEn_C_i				= instCountEn_W_o;
+	assign instCountEn_C_i					= instCountEn_W_o;
 	
-	assign instructionMemoryAddress 	= instructionMemoryAddress_F_o;
-	assign instructionMemoryReadRequest = instructionMemoryReadRequest_F_o;
-	assign instructionMemoryData_F_i	= instructionMemoryData;
-	assign instMemWaitRequest_F_i		= instructionMemoryWaitRequest;
+	assign instructionMemoryAddress 		= instructionMemoryAddress_F_o;
+	assign instructionMemoryReadRequest 	= instructionMemoryReadRequest_F_o;
+	assign instructionMemoryData_F_i		= instructionMemoryData;
+	assign instMemWaitRequest_F_i			= instructionMemoryWaitRequest;
+	assign instructionMemoryWaitRequest_C_i = instructionMemoryWaitRequest;
 
-	assign memoryAddress 				= memAddress_M_o;
-	assign memoryWriteData 				= memDataIn_M_o;
-	assign memDataOut_M_i				= memoryReadData;
-	assign memoryAccessType				= memAccessType_M_o;
-	assign memoryWriteRequest			= memWrite_M_o ;
-	assign memoryReadRequest 			= memRead_M_o ;
-	assign waitRequest_M_i				= memoryWaitRequest;
+	assign memoryAddress 					= memAddress_M_o;
+	assign memoryWriteData 					= memDataIn_M_o;
+	assign memDataOut_M_i					= memoryReadData;
+	assign memoryAccessType					= memAccessType_M_o;
+	assign memoryWriteRequest				= memWrite_M_o ;
+	assign memoryReadRequest 				= memRead_M_o ;
+	assign waitRequest_M_i					= memoryWaitRequest;
 endmodule

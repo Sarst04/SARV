@@ -29,6 +29,7 @@ module CSR_write_unit(
 	output reg		   mhpmcounter6En,
 	output reg		   mhpmcounter7En,
 	output reg		   mhpmcounter8En,
+	output reg		   mhpmcounter9En,
 	output reg		   mcountinhibitEn,
 	output reg		   mcpirateEn,
 	output reg		   mcpictrlEn
@@ -52,6 +53,7 @@ module CSR_write_unit(
 	localparam	mhpmcounter6	=	12'hB06;
 	localparam	mhpmcounter7	=	12'hB07;
 	localparam	mhpmcounter8	=	12'hB08;
+	localparam	mhpmcounter9	=	12'hB09;
 	localparam	minstreth		=	12'hB82;
 	localparam	mcountinhibit	=	12'h320;
 
@@ -84,7 +86,7 @@ module CSR_write_unit(
 	always @(operation, CSRData, CSRAddr, lastData) begin
 		{mstatusEn, mieEn, mtvecEn, mscratchEn, mepcEn, mcauseEn, mtvalEn, mcycleEn, mcyclehEn, minstretEn,
 		 minstrethEn, mcountinhibitEn, mcpirateEn, mcpictrlEn, mhpmcounter3En, mhpmcounter4En ,mhpmcounter5En,
-		mhpmcounter6En, mhpmcounter7En, mhpmcounter8En } = 20'b0;
+		mhpmcounter6En, mhpmcounter7En, mhpmcounter8En, mhpmcounter9En } = 21'b0;
 		case (CSRAddr)
 			mstatus 		:	mstatusEn 		= 1'b1; 
 			mie				:	mieEn 			= 1'b1; 
@@ -107,6 +109,7 @@ module CSR_write_unit(
 			mhpmcounter6	:	mhpmcounter6En 	= 1'b1;
 			mhpmcounter7	: 	mhpmcounter7En 	= 1'b1;
 			mhpmcounter8	: 	mhpmcounter8En 	= 1'b1;
+			mhpmcounter9	: 	mhpmcounter9En 	= 1'b1;
 		endcase
 	end
 

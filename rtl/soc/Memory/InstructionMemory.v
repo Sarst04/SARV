@@ -7,7 +7,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 module instructionMemoryModel #(
 	parameter MEM_SIZE  = 1024,
-	parameter DELAY	   	= 1
+	parameter DELAY_A	= 0,
+	parameter DELAY_B  	= 0
 ) (
     input  wire 	   clk,
     input  wire 	   rst,
@@ -31,7 +32,7 @@ module instructionMemoryModel #(
 	localparam WAIT = 1'b1;
 
 	generate
-		if (DELAY == 0) begin : ZERO_DELAY_A
+		if (DELAY_A == 0) begin : ZERO_DELAY_A
 			always @(readRequestA) begin
             	waitRequestA = 1'b0;
         	end
@@ -44,11 +45,11 @@ module instructionMemoryModel #(
 
 			always @(posedge clk, posedge rst) begin
 				if (rst) begin
-					counterA <= 4'b1111 - DELAY;
+					counterA <= 4'b1111 - DELAY_A;
 				end else if (countEnA) begin
 					counterA <= counterA + 1'b1;
 				end else if (countClearA) begin
-					counterA <= 4'b1111 - DELAY;		
+					counterA <= 4'b1111 - DELAY_A;		
 				end
 			end
 			assign carryOutA = &counterA;
@@ -88,7 +89,7 @@ module instructionMemoryModel #(
 
 
 	generate
-		if (DELAY == 0) begin : ZERO_DELAY_B
+		if (DELAY_B == 0) begin : ZERO_DELAY_B
 			always @(readRequestB) begin
             	waitRequestB = 1'b0;
         	end
@@ -101,11 +102,11 @@ module instructionMemoryModel #(
 
 			always @(posedge clk, posedge rst) begin
 				if (rst) begin
-					counterB <= 4'b1111 - DELAY;
+					counterB <= 4'b1111 - DELAY_B;
 				end else if (countEnB) begin
 					counterB <= counterB + 1'b1;
 				end else if (countClearB) begin
-					counterB <= 4'b1111 - DELAY;		
+					counterB <= 4'b1111 - DELAY_B;		
 				end
 			end
 			assign carryOutB = &counterB;

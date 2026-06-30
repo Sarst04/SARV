@@ -34,6 +34,7 @@ module CSR_read_unit(
 	input wire	[31:0] mhpmcounter6Data,
 	input wire	[31:0] mhpmcounter7Data,
 	input wire	[31:0] mhpmcounter8Data,
+	input wire	[31:0] mhpmcounter9Data,
 	input wire	[31:0] mcountinhibitData,
 	input wire	[ 3:0] mcpirateData,
 	input wire	[ 7:0] mcpictrlData,
@@ -67,6 +68,7 @@ module CSR_read_unit(
 	localparam	mhpmcounter6	=	12'hB06;
 	localparam	mhpmcounter7	=	12'hB07;
 	localparam	mhpmcounter8	=	12'hB08;
+	localparam	mhpmcounter9	=	12'hB09;
 	localparam	minstreth		=	12'hB82;
 	localparam	mcountinhibit	=	12'h320;
 
@@ -78,7 +80,7 @@ module CSR_read_unit(
 	always @(CSRAddr, mvendoridData, marchidData, mimpidData, mhartidData, mconfigptrData, mstatusData, misaData,
 			 mieData, mtvecData, mscratchData, mepcData, mcauseData, mtvalData, mipData, mcycleData, mcyclehData,
 			 minstretData, minstrethData, mhpmcounter3Data, mhpmcounter4Data, mhpmcounter5Data, mhpmcounter6Data,
-			mhpmcounter7Data, mhpmcounter8Data, mcountinhibitData, mcpirateData, mcpictrlData) begin
+			mhpmcounter7Data, mhpmcounter8Data, mhpmcounter9Data, mcountinhibitData, mcpirateData, mcpictrlData) begin
 		selectedData = 32'b0;
 		case (CSRAddr) 
 			mvendorid 		: selectedData = mvendoridData;
@@ -108,6 +110,7 @@ module CSR_read_unit(
 			mhpmcounter6	: selectedData = mhpmcounter6Data;
 			mhpmcounter7	: selectedData = mhpmcounter7Data;
 			mhpmcounter8	: selectedData = mhpmcounter8Data;
+			mhpmcounter9	: selectedData = mhpmcounter9Data;
 			mcountinhibit 	: selectedData = mcountinhibitData;
 	
 			mcpirate		: selectedData = {28'b0, mcpirateData};

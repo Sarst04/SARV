@@ -7,7 +7,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 module dataMemoryModel #(
 	parameter MEM_SIZE 	= 1024,
-	parameter DELAY	   	= 1
+	parameter DELAY	   	= 0
 ) (
 	input wire 			clk,
 	input wire 			rst,
