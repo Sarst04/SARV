@@ -11,6 +11,7 @@ module load_store_unit(
 	input  wire		   	memWrite_M_i,
 	input  wire			waitRequest_M_i,
 	input  wire	[ 2:0]	funct3_M_i,
+	input  wire			disableLoadStore,
 
 	output wire			memRead_M_o,
 	output wire			memWrite_M_o,
@@ -35,8 +36,8 @@ module load_store_unit(
 
 	assign	memAddress_M_o		=	exeResult_M_i;
 	assign	memDataIn_M_o		=	rs2Data_M_i;
-	assign 	memRead_M_o			=	memRead_M_i;
-	assign 	memWrite_M_o		=	memWrite_M_i;
+	assign 	memRead_M_o			=	memRead_M_i  & (disableLoadStore == 1'b0);
+	assign 	memWrite_M_o		=	memWrite_M_i & (disableLoadStore == 1'b0);
 	assign  waitRequest_M_o 	=   waitRequest_M_i;
 	assign  memAccessType_M_o	=	funct3_M_i[1:0];
 	

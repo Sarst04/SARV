@@ -10,7 +10,7 @@ module pipe_manager_unit (
 	input  wire 		rst,
 
 	// Control signal
-	input  wire			jumpOrBranch,
+	input  wire			jumpOrBranchFlush_A_o,
 	input  wire 		memRead_E,
 	input  wire 		memWrite_E,
 	input  wire			mulEn_X1_i,
@@ -36,6 +36,8 @@ module pipe_manager_unit (
 	output wire			clear_W,
 	output wire			stall_W,
 	output wire			stallStatus,
+	output wire			disableLoadStore_M_i,
+	output wire			disableInstLoad_F_i,
 	
 	// Data signal
 	input  wire [ 4:0] 	rs1Add_D,
@@ -49,6 +51,11 @@ module pipe_manager_unit (
 	output reg  [ 1:0] 	forwardA_E_i,
 	output reg  [ 1:0] 	forwardB_E_i
 );
+	wire   	loadWordStall;
+	wire	multiplyStall;	
+	wire    pauseCore;
+	wire   	fullPipeStall;
+
 	// ForwardA_E
 	always @(rs1Add_E, rd_M, rd_W, regWrite_M, regWrite_W) begin
 		if ( ( (rs1Add_E == rd_M) & regWrite_M ) & (rs1Add_E != 5'b0) )
@@ -70,16 +77,18 @@ module pipe_manager_unit (
 	end
 
 
-	wire   	loadWordStall			= memRead_E & ( (rs1Add_D == rd_E) | (rs2Add_D == rd_E) );
-	wire	multiplyStall			= ( (rs1Add_D == rd_E) | (rs2Add_D == rd_E)  ) & mulEn_X1_i;
+	assign  loadWordStall			= memRead_E & ( (rs1Add_D == rd_E) | (rs2Add_D == rd_E) );
+	assign	multiplyStall			= ( (rs1Add_D == rd_E) | (rs2Add_D == rd_E)  ) & mulEn_X1_i;
 	assign 	disablePCAdder_F_i		= coldDownPipe_C_o | waitRequest_F_o;
-	wire    pauseCore				= pauseCore_E_o & (~coldDownPipe_C_o);
-	wire   	fullPipeStall			= stallPipe_C_o;
+	assign  pauseCore				= pauseCore_E_o & (~coldDownPipe_C_o);
+	assign  fullPipeStall			= stallPipe_C_o;
+	assign  disableLoadStore_M_i	= stallPipe_C_o;
+	assign  disableInstLoad_F_i		= stallPipe_C_o;
 
 	assign clear_F 					= 1'b0;
-	assign clear_D 					= (jumpOrBranch	| cleanPipe_C_o | coldDownPipe_C_o | waitRequest_F_o) 	& (~fullPipeStall) & (~waitRequest_M_o);
-	assign clear_EC 				= (jumpOrBranch | cleanPipe_C_o | loadWordStall    | multiplyStall  ) 	& (~fullPipeStall) & (~waitRequest_M_o);
-	assign clear_MX 				= (pauseCore)															& (~fullPipeStall) & (~waitRequest_M_o);
+	assign clear_D 					= (jumpOrBranchFlush_A_o | cleanPipe_C_o | coldDownPipe_C_o | waitRequest_F_o) 	& (~fullPipeStall) & (~waitRequest_M_o);
+	assign clear_EC 				= (jumpOrBranchFlush_A_o | cleanPipe_C_o | loadWordStall    | multiplyStall  ) 	& (~fullPipeStall) & (~waitRequest_M_o);
+	assign clear_MX 				= (pauseCore)																	& (~fullPipeStall) & (~waitRequest_M_o);
 	assign clear_W 					= 1'b0;
 
 	assign stall_F 					= loadWordStall | fullPipeStall   | waitRequest_M_o | pauseCore | multiplyStall;

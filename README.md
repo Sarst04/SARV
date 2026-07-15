@@ -65,9 +65,9 @@ The core is written in Verilog HDL and targets FPGA and ASIC implementations. It
 
 | Metric | Value |
 | :--- | :--- |
-| CoreMark | 1433.87 |
-| Frequency | 550 MHz (simulated) |
-| CoreMark/MHz | 2.61 |
+| CoreMark | 1581.00 |
+| Frequency | 500 MHz (simulated) |
+| CoreMark/MHz | 3.162 |
 | Simulation | Gate-level, ideal memory |
 | Flags      | -march=rv32ib_zicond_zmmul_zicsr -mabi=ilp32 -O3 |
 
@@ -88,12 +88,10 @@ The core is written in Verilog HDL and targets FPGA and ASIC implementations. It
 
 | Metric | Value |
 | :--- | :--- |
-| **Total Area** | 30.320 µm² |
-| **Sequential Area** | 11.416 µm² (38.0%) |
-| **Combinational Area** | 18.904 µm² (62.0%) |
-| **Cell Count** | 22,139 |
-| **KGE** | 11.4 kGE |
-| **Flip-Flops (DFFR/DFFS)** | 2,146 |
+| **Total Area** | 32.203 µm² |
+| **Cell Count** | 23,092 |
+| **KGE** | 12.1 kGE |
+| **Flip-Flops (DFFR/DFFS)** | 2,420 |
 | **Synthesis Tool** | Yosys |
 |**Post-synthesis estimated Fmax** | 550 MHz |
 

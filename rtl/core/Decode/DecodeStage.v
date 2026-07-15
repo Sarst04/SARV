@@ -13,6 +13,7 @@ module decode_stage (
 	input  wire		   stall_D_i,
 	input  wire		   instCountEn_D_i,
 	input  wire		   stageSignalValid_D_i,
+	input  wire		   predictTaken_D_i,
 
 	output wire		   instCountEn_D_o,
 	output wire		   stageSignalValid_D_o,
@@ -30,6 +31,7 @@ module decode_stage (
 	output wire		   pause_D_o,
 	output wire		   mulEn_D_o,
 	output wire	[ 1:0] mulOpCode_D_o,
+	output wire		   predictTaken_D_o,
 
 	// Data signal
     input wire  [31:0] nextPC_D_i,
@@ -51,6 +53,7 @@ module decode_stage (
 );
 	assign stageSignalValid_D_o		=	stageSignalValid_D_i;
 	assign instCountEn_D_o			=	instCountEn_D_i & (~stall_D_i);
+	assign  predictTaken_D_o		=	predictTaken_D_i;
 	
 	wire [ 2:0] immExtendSelect;
 

@@ -12,7 +12,6 @@ module CSR_CPI_manager(
 	input  wire	[ 1:0]	priv,
 	input  wire	[ 3:0]	CPIRate,
 	input  wire [ 7:0]  CPICTRL,
-	input  wire			instructionMemoryWaitRequest,
 
 	output wire			stallCore
 );
@@ -63,20 +62,8 @@ module CSR_CPI_manager(
 		end
 	end
 	
-
-	reg lastInstWaitRequest;
-	always @(posedge clk, posedge rst) begin
-		if (rst)
-			lastInstWaitRequest = 1'b0;
-		else if (enable)
-			lastInstWaitRequest = instructionMemoryWaitRequest;
-	end
-
-	wire   instWaitRequestFirstLow;
-	assign instWaitRequestFirstLow 	= (instructionMemoryWaitRequest == 1'b0) & (lastInstWaitRequest == 1'b1);
-
-	assign stallCore = ((|(stallMask & ringOut)) ^ sign) & enable & (~instWaitRequestFirstLow);
-
+	assign stallCore = ((|(stallMask & ringOut)) ^ sign) & enable;
+	
 endmodule
 
 

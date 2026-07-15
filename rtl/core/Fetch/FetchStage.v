@@ -13,11 +13,14 @@ module fetch_stage (
 	input  wire		   	stall_F_i,
 	input  wire			instMemWaitRequest_F_i,
 	input  wire			disablePCAdder_F_i,
+	input  wire			disableInstLoad_F_i,
+	input  wire			predictTaken_F_i,
 	
 	output wire			instCountEn_F_o,
 	output wire			instMemWaitRequest_F_o,
 	output wire			stageSignalValid_F_o,
 	output wire			instructionMemoryReadRequest_F_o,
+	output wire			predictTaken_F_o,
 
 	// Data signal
 	input  wire [31:0]	PC_F_i,
@@ -32,6 +35,7 @@ module fetch_stage (
 
 	assign	instCountEn_F_o			=	~stall_F_i;
 	assign	stageSignalValid_F_o	=	~stall_F_i;
+	assign  predictTaken_F_o		=	predictTaken_F_i;
 
 	assign	PC_F_o					=	PC_F_i;
 	
@@ -47,9 +51,13 @@ module fetch_stage (
 	
 	instruction_load_unit InstructionLoadUnit(
 		.waitRequest_F_i(instMemWaitRequest_F_i),
+		.disableInstLoad_F_i(disableInstLoad_F_i),
+
 		.waitRequest_F_o(instMemWaitRequest_F_o),
+
 		.PC_F_i(PC_F_i),
 		.instructionMemoryData_F_i(instructionMemoryData_F_i),
+
 		.instructionMemoryAddress_F_o(instructionMemoryAddress_F_o),
 		.instructionMemoryData(instructionMemoryData),
 		.instructionMemoryReadRequest_F_o(instructionMemoryReadRequest_F_o)

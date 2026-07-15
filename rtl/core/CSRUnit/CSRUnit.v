@@ -22,7 +22,6 @@ module CSR_unit#(
 	input  wire		    instCountEn_C_i,
 	input  wire			stageDEMWValid_C_i,
 	input  wire	[ 4:0]	pmCounterEn_C_i,
-	input  wire			instructionMemoryWaitRequest_C_i,
 
 	output wire			cleanPipe_C_o,
 	output wire 		stallPipe_C_o,
@@ -215,7 +214,6 @@ module CSR_unit#(
 		.priv(2'b0),
 		.CPIRate(mcpirateData),
 		.CPICTRL(mcpictrlData),
-		.instructionMemoryWaitRequest(instructionMemoryWaitRequest_C_i),
 
 
 		.stallCore(stallPipeCPIUnit)

@@ -1,12 +1,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 // File      : SARV.v
 // Author(s) : Sayyid Amirreza Sayyid Torabi <sayyidtorabi@gmail.com>
-// Date      : 2026-06-15 (last modified)
+// Date      : 2026-07-14 (last modified)
 // Description:
 //   
 ////////////////////////////////////////////////////////////////////////////////
 module SARV_Core #(
-	parameter	HART_ID = 0
+	parameter		   HART_ID = 0,
+    parameter 		   BRANCH_PREDICTION_ENTRY_INDEX_BITS = 5
 )(
     input  wire 	   clk,
     input  wire 	   rst,
@@ -34,6 +35,11 @@ module SARV_Core #(
 	// Control signal
 	wire		changePCSrc_E_o_A_i;
 	wire		changePCSrc_C_o_A_i;
+	wire		branchTakenDetect_E_o_A_i;
+
+	wire		jumpOrBranchFlush_A_o;
+	wire		predictTaken_A_o;
+
 	// Data signal
 	wire [31:0]	PCTarget_E_o_A_i;
 	wire [31:0]	PCTarget_C_o_A_i;
@@ -45,11 +51,14 @@ module SARV_Core #(
 	// Control signal
 	wire		instMemWaitRequest_F_i;
 	wire		disablePCAdder_F_i;
+	wire		disableInstLoad_F_i;
+	wire		predictTaken_F_i;
 
 	wire		instCountEn_F_o;
 	wire		instMemWaitRequest_F_o;
 	wire		stageSignalValid_F_o;
 	wire		instructionMemoryReadRequest_F_o;
+	wire		predictTaken_F_o;
 
 	// Data signal
 	wire [31:0] PC_F_i;
@@ -63,6 +72,7 @@ module SARV_Core #(
 	// Control signall
 	wire		instCountEn_D_i;
 	wire		stageSignalValid_D_i;
+	wire		predictTaken_D_i;
 
 	wire 		mulEn_D_o;
 	wire [ 1:0]	mulOpCode_D_o;
@@ -80,6 +90,8 @@ module SARV_Core #(
 	wire		system_D_o;
 	wire		stageSignalValid_D_o;
 	wire		pause_D_o;
+	wire		predictTaken_D_o;
+
 	// Data signall
 	wire [31:0] nextPC_D_i;
 	wire [31:0] PC_D_i;
@@ -114,6 +126,7 @@ module SARV_Core #(
 	wire [ 1:0] writeBackSrcSelect_E_i;
 	wire		stageSignalValid_E_i;
 	wire		pause_E_i;
+	wire		predictTaken_E_i;
 
 	wire		instCountEn_E_o;
 	wire [ 1:0] writeBackSrcSelect_E_o;
@@ -123,6 +136,7 @@ module SARV_Core #(
 	wire [ 2:0] funct3_E_o;
 	wire		stageSignalValid_E_o;
 	wire		pauseCore_E_o;
+	wire		predictTaken_E_o;
 
 	// Data signal
 	wire [31:0] nextPC_E_i;
@@ -172,6 +186,7 @@ module SARV_Core #(
 	wire [ 2:0] funct3_M_i;
 	wire		waitRequest_M_i;
 	wire		stageSignalValid_M_i;
+	wire		disableLoadStore_M_i;
 
 	wire		instCountEn_M_o;
 	wire [ 1:0] writeBackSrcSelect_M_o;
@@ -256,7 +271,6 @@ module SARV_Core #(
 	wire		system_C_i;
 	wire		instCountEn_C_i;
 	wire [ 4:0]	pmCounterEn_C_i;
-	wire		instructionMemoryWaitRequest_C_i;
 
 	wire		stallPipe_C_o;
 	wire		changeExeSrc_C_o;
@@ -284,7 +298,7 @@ module SARV_Core #(
 		.clk(clk),
 		.rst(rst),
 
-		.jumpOrBranch(changePCSrc_E_o_A_i),
+		.jumpOrBranchFlush_A_o(jumpOrBranchFlush_A_o),
 		.memRead_E(memRead_E_i),
 		.memWrite_E(memWrite_E_i),
 		.mulEn_X1_i(mulEn_X1_i),
@@ -310,6 +324,9 @@ module SARV_Core #(
 		.clear_W(clear_W),
 		.stall_W(stall_W),
 		.stallStatus(stallStatus),
+		.disableLoadStore_M_i(disableLoadStore_M_i),
+		.disableInstLoad_F_i(disableInstLoad_F_i),
+
 		.rs1Add_D(rs1Addr_D_o),
 		.rs2Add_D(rs2Addr_D_o),
 		.rs1Add_E(rs1Addr_E_i),
@@ -321,22 +338,35 @@ module SARV_Core #(
 		.forwardB_E_i(forwardB_E_i)
 	);
 
- 	addressGeneration_stage AddressGenerayion (
+ 	addressGeneration_stage #(
+		.BRANCH_PREDICTION_ENTRY_INDEX_BITS(BRANCH_PREDICTION_ENTRY_INDEX_BITS)
+		) AddressGenerayion (
 		.clk(clk),
 		.rst(rst),
 
 		.changePCSrc_E_o_A_i(changePCSrc_E_o_A_i),
 		.changePCSrc_C_o_A_i(changePCSrc_C_o_A_i),
+		.branchTakenDetect_E_o_A_i(branchTakenDetect_E_o_A_i),
+		.branch_E_o_A_i(branch_E_i),
+		.predictTaken_E_o_A_i(predictTaken_E_o),
+		
+		.jumpOrBranchFlush_A_o(jumpOrBranchFlush_A_o),
+		.predictTaken_A_o(predictTaken_A_o),
 
 		.PCTarget_E_o_A_i(PCTarget_E_o_A_i),
 		.PCTarget_C_o_A_i(PCTarget_C_o_A_i),
+		.PC_E_o_A_i(PC_E_i),
 		.nextPC_A_i(nextPC_F_o),
+		.PC_F_o_A_i(PC_F_o),
+		.nextPC_E_o_A_i(nextPC_E_o),
 
 		.selectedPC_A_o(selectedPC_A_o),
 		.PC_A_o(PC_A_o)
 	);
-	assign	changePCSrc	=	changePCSrc_E_o_A_i | changePCSrc_C_o_A_i;
+	assign	changePCSrc	=	jumpOrBranchFlush_A_o | changePCSrc_C_o_A_i;
 
+
+	assign 	predictTaken_F_i = predictTaken_A_o;
 	register #(32) Fetch_Reg (
         .clk(clk),
         .rst(rst),
@@ -354,11 +384,14 @@ module SARV_Core #(
 		.stall_F_i(stall_F),
 		.instMemWaitRequest_F_i(instMemWaitRequest_F_i),
 		.disablePCAdder_F_i(disablePCAdder_F_i),
+		.disableInstLoad_F_i(disableInstLoad_F_i),
+		.predictTaken_F_i(predictTaken_F_i),
 
 		.instCountEn_F_o(instCountEn_F_o),
 		.instMemWaitRequest_F_o(instMemWaitRequest_F_o),
 		.stageSignalValid_F_o(stageSignalValid_F_o),
 		.instructionMemoryReadRequest_F_o(instructionMemoryReadRequest_F_o),
+		.predictTaken_F_o(predictTaken_F_o),
 		
 		.PC_F_i(PC_F_i),
 		.instructionMemoryData_F_i(instructionMemoryData_F_i),
@@ -369,15 +402,15 @@ module SARV_Core #(
 		.nextPC_F_o(nextPC_F_o)
 	);
 	
-	register #(98) Decode_Reg (
+	register #(99) Decode_Reg (
         .clk(clk),
         .rst(rst),
         .enable(~stall_D),
         .clear(clear_D),
         .regIn(  {instCountEn_F_o, stageSignalValid_F_o
-					,PC_F_o, nextPC_F_o, instruction_F_o }),
+					,PC_F_o, nextPC_F_o, instruction_F_o, predictTaken_F_o}),
         .regOut( {instCountEn_D_i, stageSignalValid_D_i
-					,PC_D_i, nextPC_D_i, instruction_D_i })
+					,PC_D_i, nextPC_D_i, instruction_D_i, predictTaken_D_i})
     );
 
 	
@@ -388,6 +421,7 @@ module SARV_Core #(
 		.stall_D_i(stall_D),
 		.instCountEn_D_i(instCountEn_D_i),
 		.stageSignalValid_D_i(stageSignalValid_D_i),
+		.predictTaken_D_i(predictTaken_D_i),
 
 		.stageSignalValid_D_o(stageSignalValid_D_o),
 		.instCountEn_D_o(instCountEn_D_o),
@@ -405,6 +439,7 @@ module SARV_Core #(
 		.pause_D_o(pause_D_o),
 		.mulEn_D_o(mulEn_D_o),
 		.mulOpCode_D_o(mulOpCode_D_o),
+		.predictTaken_D_o(predictTaken_D_o),
 
 		.nextPC_D_i(nextPC_D_i),
 		.PC_D_i(PC_D_i),
@@ -422,16 +457,15 @@ module SARV_Core #(
 		.funct12_D_o(funct12_D_o)
 	);
 
-	register #(201) Execute_Reg (
+	register #(202) Execute_Reg (
         .clk(clk),
         .rst(rst),
         .enable(~stall_EC),
         .clear(clear_EC),
         .regIn( {instCountEn_D_o, ALUSrcAType_D_o, ALUSrcBType_D_o, ALUOpcode_D_o, memWrite_D_o, memRead_D_o, regWrite_D_o,funct3_D_o, jump_D_o, branch_D_o, writeBackSrcSelect_D_o, stageSignalValid_D_o, pause_D_o, mulEn_D_o, mulOpCode_D_o
-				,PC_D_o, nextPC_D_o, rs1Data_D_o, rs2Data_D_o, immExtend_D_o, rd_D_o, rs1Addr_D_o, rs2Addr_D_o }),
+				,PC_D_o, nextPC_D_o, rs1Data_D_o, rs2Data_D_o, immExtend_D_o, rd_D_o, rs1Addr_D_o, rs2Addr_D_o, predictTaken_D_o }),
         .regOut({instCountEn_E_i, ALUSrcAType_E_i, ALUSrcBType_E_i, ALUOpcode_E_i, memWrite_E_i, memRead_E_i, regWrite_E_i,funct3_E_i, jump_E_i, branch_E_i, writeBackSrcSelect_E_i, stageSignalValid_E_i, pause_E_i, mulEn_X1_i, mulOpCode_X1_i
-
-				,PC_E_i, nextPC_E_i, rs1Data_E_i, rs2Data_E_i, immExtend_E_i, rd_E_i, rs1Addr_E_i, rs2Addr_E_i })
+				,PC_E_i, nextPC_E_i, rs1Data_E_i, rs2Data_E_i, immExtend_E_i, rd_E_i, rs1Addr_E_i, rs2Addr_E_i, predictTaken_E_i })
     );
 	
 	assign	stageDEValid	=	stageSignalValid_E_i	|	stageSignalValid_D_i;
@@ -468,16 +502,19 @@ module SARV_Core #(
 		.forwardA_E_i(forwardA_E_i),
 		.forwardB_E_i(forwardB_E_i),
 		.pause_E_i(pause_E_i),
+		.predictTaken_E_i(predictTaken_E_i),
 
 		.instCountEn_E_o(instCountEn_E_o),
 		.memWrite_E_o(memWrite_E_o),
 		.memRead_E_o(memRead_E_o),
 		.regWrite_E_o(regWrite_E_o),
 		.changePCSrc_E_o_A_i(changePCSrc_E_o_A_i),
+		.branchTakenDetect_E_o_A_i(branchTakenDetect_E_o_A_i),
 		.writeBackSrcSelect_E_o(writeBackSrcSelect_E_o),
 		.funct3_E_o(funct3_E_o),
 		.stageSignalValid_E_o(stageSignalValid_E_o),
 		.pauseCore_E_o(pauseCore_E_o),
+		.predictTaken_E_o(predictTaken_E_o),
 
 		.nextPC_E_i(nextPC_E_i),
 		.rs1Data_E_i(rs1Data_E_i),
@@ -530,7 +567,6 @@ module SARV_Core #(
 		.changeExeSrc_C_o(changeExeSrc_C_o),
 		.cleanPipe_C_o(cleanPipe_C_o),
 		.pmCounterEn_C_i(pmCounterEn_C_i),
-		.instructionMemoryWaitRequest_C_i(instructionMemoryWaitRequest_C_i),
 		
 		.PC_E_o_C_i(PC_E_i),
 		.PC_A_o_C_i(selectedPC_A_o),
@@ -574,6 +610,7 @@ module SARV_Core #(
 		.funct3_M_i(funct3_M_i),
 		.waitRequest_M_i(waitRequest_M_i),
 		.stageSignalValid_M_i(stageSignalValid_M_i),
+		.disableLoadStore_M_i(disableLoadStore_M_i),
 
 		.instCountEn_M_o(instCountEn_M_o),
 		.memWrite_M_o(memWrite_M_o),
@@ -721,13 +758,12 @@ module SARV_Core #(
 	assign instructionMemoryReadRequest 	= instructionMemoryReadRequest_F_o;
 	assign instructionMemoryData_F_i		= instructionMemoryData;
 	assign instMemWaitRequest_F_i			= instructionMemoryWaitRequest;
-	assign instructionMemoryWaitRequest_C_i = instructionMemoryWaitRequest;
 
 	assign memoryAddress 					= memAddress_M_o;
 	assign memoryWriteData 					= memDataIn_M_o;
 	assign memDataOut_M_i					= memoryReadData;
 	assign memoryAccessType					= memAccessType_M_o;
-	assign memoryWriteRequest				= memWrite_M_o ;
-	assign memoryReadRequest 				= memRead_M_o ;
+	assign memoryWriteRequest				= memWrite_M_o;
+	assign memoryReadRequest 				= memRead_M_o;
 	assign waitRequest_M_i					= memoryWaitRequest;
 endmodule

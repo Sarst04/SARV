@@ -26,6 +26,7 @@ module execute_stage (
 	input  wire [ 1:0] forwardA_E_i,
 	input  wire [ 1:0] forwardB_E_i,
 	input  wire		   pause_E_i,
+	input  wire		   predictTaken_E_i,
 
 	output wire		   instCountEn_E_o,
 	output wire		   stageSignalValid_E_o,
@@ -33,9 +34,11 @@ module execute_stage (
 	output wire 	   memRead_E_o,
 	output wire 	   regWrite_E_o,
 	output wire		   changePCSrc_E_o_A_i,
+	output wire		   branchTakenDetect_E_o_A_i,
 	output wire [ 1:0] writeBackSrcSelect_E_o,
 	output wire [ 2:0] funct3_E_o,
 	output wire		   pauseCore_E_o,
+	output wire		   predictTaken_E_o,
 
 	// Data signal
 	input  wire [31:0] nextPC_E_i,
@@ -56,6 +59,7 @@ module execute_stage (
 );
 	assign stageSignalValid_E_o			=	stageSignalValid_E_i;
 	assign instCountEn_E_o				=	instCountEn_E_i & (~stall_E_i);
+	assign predictTaken_E_o				=	predictTaken_E_i;
 
 	wire [31:0]		rs1Data;
 	wire [31:0]		rs2Data;
@@ -99,7 +103,8 @@ module execute_stage (
 		.ALUOpcode(ALUOpcode_E_i),
 		.result(ALUResult_E_o)
 	);
-	assign changePCSrc_E_o_A_i 		= jump_E_i | takeBranch;
+	assign changePCSrc_E_o_A_i 		= jump_E_i;
+	assign branchTakenDetect_E_o_A_i= takeBranch;
 
 
 	assign memWrite_E_o 			= memWrite_E_i;
