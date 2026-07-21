@@ -65,9 +65,9 @@ The core is written in Verilog HDL and targets FPGA and ASIC implementations. It
 
 | Metric | Value |
 | :--- | :--- |
-| CoreMark | 1581.00 |
+| CoreMark | 1448.624531 |
 | Frequency | 500 MHz (simulated) |
-| CoreMark/MHz | 3.162 |
+| CoreMark/MHz | 2.897 |
 | Simulation | Gate-level, ideal memory |
 | Flags      | -march=rv32ib_zicond_zmmul_zicsr -mabi=ilp32 -O3 |
 
