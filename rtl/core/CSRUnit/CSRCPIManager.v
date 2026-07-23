@@ -62,7 +62,7 @@ module CSR_CPI_manager(
 		end
 	end
 	
-	assign stallCore = ((|(stallMask & ringOut)) ^ sign) & enable;
+	assign stallCore = ((|(stallMask & ringOut)) ^ sign) & enable ;
 	
 endmodule
 

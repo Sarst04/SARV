@@ -38,8 +38,10 @@ module tb;
 		end
 	end
 	`define UART_ADDR 32'h1000_0000
-	always @(soc.MemoryWriteRequest && soc.MemoryAddress == `UART_ADDR) begin
-    	$write("%c",soc.MemoryWriteData);
+	always @(posedge clk) begin
+		if (soc.MemoryWriteRequest && soc.MemoryAddress == `UART_ADDR) begin
+            $write("%c",soc.MemoryWriteData); 
+		end
 	end
 	`define SIMEND_ADDR 32'h2000_0000
 	always @(posedge clk) begin

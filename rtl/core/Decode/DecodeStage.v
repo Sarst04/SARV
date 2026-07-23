@@ -14,6 +14,7 @@ module decode_stage (
 	input  wire		   instCountEn_D_i,
 	input  wire		   stageSignalValid_D_i,
 	input  wire		   predictTaken_D_i,
+	input  wire		   returnDetected_D_i,
 
 	output wire		   instCountEn_D_o,
 	output wire		   stageSignalValid_D_o,
@@ -32,6 +33,8 @@ module decode_stage (
 	output wire		   mulEn_D_o,
 	output wire	[ 1:0] mulOpCode_D_o,
 	output wire		   predictTaken_D_o,
+	output wire		   returnDetected_D_o,
+	output wire		   RASTargetMatch_D_o,
 
 	// Data signal
     input wire  [31:0] nextPC_D_i,
@@ -39,6 +42,7 @@ module decode_stage (
     input wire  [31:0] instruction_D_i,
 	input wire  [31:0] rs1Data_D_i,
 	input wire  [31:0] rs2Data_D_i,
+	input wire  [31:0] topOfRas_D_i,
 
 
 	output wire [31:0] nextPC_D_o,
@@ -51,9 +55,12 @@ module decode_stage (
 	output wire [ 4:0] rs2Addr_D_o,
 	output wire	[11:0] funct12_D_o
 );
-	assign stageSignalValid_D_o		=	stageSignalValid_D_i;
-	assign instCountEn_D_o			=	instCountEn_D_i & (~stall_D_i);
-	assign  predictTaken_D_o		=	predictTaken_D_i;
+	assign stageSignalValid_D_o		= stageSignalValid_D_i;
+	assign instCountEn_D_o			= instCountEn_D_i & (~stall_D_i);
+	assign predictTaken_D_o			= predictTaken_D_i;
+	assign returnDetected_D_o		= returnDetected_D_i;
+	assign RASTargetMatch_D_o 		= (rs1Data_D_i == topOfRas_D_i);
+
 	
 	wire [ 2:0] immExtendSelect;
 
@@ -94,7 +101,7 @@ module decode_stage (
 		.immExtendSelect(immExtendSelect),
 		.immExt(immExtend_D_o)
 	);
-	
+
 	assign rs1Data_D_o 	= rs1Data_D_i;
 	assign rs2Data_D_o 	= rs2Data_D_i;
 

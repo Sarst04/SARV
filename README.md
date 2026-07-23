@@ -18,31 +18,31 @@ The core is written in Verilog HDL and targets FPGA and ASIC implementations. It
 
 | Extension | Description | Status |
 | :--- | :--- | :--- |
-| **RV32I** | Base Integer Instructions |  Full |
-| **Zmmul** | Integer Multiplication (no division) |  Full |
-| **Zicond** | Conditional Operations |  Full |
-| **Zihintpause** | Pause Hint Instruction |  Full |
+| **RV32I** | Base Integer Instructions | Full |
+| **Zmmul** | Integer Multiplication (no division) | Full |
+| **Zicond** | Conditional Operations | Full |
+| **Zihintpause** | Pause Hint Instruction | Full |
 
 ### Compressed Instructions (C)
 
 | Sub-extension | Description | Status |
 | :--- | :--- | :--- |
-| Zca | Integer Compressed |  Full |
+| Zca | Integer Compressed | Full |
 
 ### Bit Manipulation (B)
 
 | Sub-extension | Description | Status |
 | :--- | :--- | :--- |
-| Zba | Address Generation |  Full |
-| Zbb | Basic Bit-Manipulation |  Full |
-| Zbs | Single-Bit Operations |  Full |
+| Zba | Address Generation | Full |
+| Zbb | Basic Bit-Manipulation | Full |
+| Zbs | Single-Bit Operations | Full |
 
 ### Control & Status
 
 | Extension | Description | Status |
 | :--- | :--- | :--- |
-| **Zicsr** | Control Status Registers |  Full |
-| **Zihpm** | Hardware Performance Monitors |  Full |
+| **Zicsr** | Control Status Registers | Full |
+| **Zihpm** | Hardware Performance Monitors | Full |
 
 ### Interrupts
 
@@ -56,7 +56,7 @@ The core is written in Verilog HDL and targets FPGA and ASIC implementations. It
 
 | Feature | Description | Status |
 | :--- | :--- | :--- |
-| **WFI** | Wait for Interrupt — halts core until IRQ |  Supported |
+| **WFI** | Wait for Interrupt — halts core until IRQ | Supported |
 
 ---
 
@@ -72,6 +72,7 @@ The core is written in Verilog HDL and targets FPGA and ASIC implementations. It
 | Flags      | -march=rv32ib_zicond_zmmul_zicsr -mabi=ilp32 -O3 |
 
 *Measured in gate-level simulation without cache/memory latency. Provides architectural comparison point.*
+*The design under test uses a Branch Target Buffer (BTB) with 4 entries (BRANCH_PREDICTION_ENTRY_INDEX_BITS = 2) and a Return Address Stack (RAS) with 2 entries (RETURN_ADDRESS_PREDICTION_ENTRY_INDEX_BITS = 1).*
 
 
 ## Verification
@@ -88,10 +89,10 @@ The core is written in Verilog HDL and targets FPGA and ASIC implementations. It
 
 | Metric | Value |
 | :--- | :--- |
-| **Total Area** | 32.203 µm² |
-| **Cell Count** | 23,092 |
-| **KGE** | 12.1 kGE |
-| **Flip-Flops (DFFR/DFFS)** | 2,420 |
+| **Total Area** | 33.428 µm² |
+| **Cell Count** | 23,840 |
+| **KGE** | 12.56 kGE |
+| **Flip-Flops (DFFR/DFFS)** | 2,486 |
 | **Synthesis Tool** | Yosys |
 |**Post-synthesis estimated Fmax** | 550 MHz |
 

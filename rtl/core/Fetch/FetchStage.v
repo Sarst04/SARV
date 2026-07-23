@@ -21,6 +21,7 @@ module fetch_stage (
 	output wire			stageSignalValid_F_o,
 	output wire			instructionMemoryReadRequest_F_o,
 	output wire			predictTaken_F_o,
+	output wire			returnDetected_F_o,
 
 	// Data signal
 	input  wire [31:0]	PC_F_i,
@@ -48,6 +49,13 @@ module fetch_stage (
 
 	wire [31:0]	PCAdderInB;
 	assign	PCAdderInB		= (disablePCAdder_F_i == 0) ? PCStep			: 32'd0;
+
+ 	return_detector ReturnDetector(
+		.instruction(instruction_F_o),
+
+		.return(returnDetected_F_o)
+	);
+
 	
 	instruction_load_unit InstructionLoadUnit(
 		.waitRequest_F_i(instMemWaitRequest_F_i),

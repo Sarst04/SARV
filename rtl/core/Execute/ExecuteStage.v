@@ -27,18 +27,23 @@ module execute_stage (
 	input  wire [ 1:0] forwardB_E_i,
 	input  wire		   pause_E_i,
 	input  wire		   predictTaken_E_i,
+	input  wire		   returnDetected_E_i,
+	input  wire		   RASTargetMatch_E_i,
 
 	output wire		   instCountEn_E_o,
 	output wire		   stageSignalValid_E_o,
 	output wire 	   memWrite_E_o,
 	output wire 	   memRead_E_o,
 	output wire 	   regWrite_E_o,
-	output wire		   changePCSrc_E_o_A_i,
+	output wire		   jumpDetect_E_o,
 	output wire		   branchTakenDetect_E_o_A_i,
 	output wire [ 1:0] writeBackSrcSelect_E_o,
 	output wire [ 2:0] funct3_E_o,
 	output wire		   pauseCore_E_o,
 	output wire		   predictTaken_E_o,
+	output wire		   callDetected_E_o,
+	output wire		   returnDetected_E_o,
+	output wire		   RASTargetMatch_E_o,
 
 	// Data signal
 	input  wire [31:0] nextPC_E_i,
@@ -89,6 +94,13 @@ module execute_stage (
 		.pauseCore(pauseCore_E_o)
 	);
 
+	call_detector CallDetector(
+		.jump(jump_E_i),
+		.rd(rd_E_i),
+
+		.call(callDetected_E_o)
+	);
+
 	branch_decision branchDecision(
 		.srcA(rs1Data),
 		.srcB(rs2Data),
@@ -103,8 +115,10 @@ module execute_stage (
 		.ALUOpcode(ALUOpcode_E_i),
 		.result(ALUResult_E_o)
 	);
-	assign changePCSrc_E_o_A_i 		= jump_E_i;
+	assign jumpDetect_E_o	 		= jump_E_i;
 	assign branchTakenDetect_E_o_A_i= takeBranch;
+	assign returnDetected_E_o		= returnDetected_E_i;
+	assign RASTargetMatch_E_o		= RASTargetMatch_E_i;
 
 
 	assign memWrite_E_o 			= memWrite_E_i;
