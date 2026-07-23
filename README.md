@@ -11,8 +11,9 @@ The core is written in Verilog HDL and targets FPGA and ASIC implementations. It
 
 ## Documentation
 - [CSR & interrupts](docs/csr_interrupts.md#csr-interrupts)
-- [Critical Path](docs/criticalPath.md#critical-path)
+- [Critical Path](docs/critical_path.md#critical-path)
 - [Power Control](docs/clock_throttling.md#clock-throttling)
+- [Branch Prediction](docs/branch_prediction.md#branch-prediction)
 
 ## ISA Support
 
