@@ -10,10 +10,13 @@ The core is written in Verilog HDL and targets FPGA and ASIC implementations. It
 ---
 
 ## Documentation
+
+- [Architectural & ABI Comparisons](docs/architectural_comparisons.md#architectural-comparisons)
 - [CSR & interrupts](docs/csr_interrupts.md#csr-interrupts)
 - [Critical Path](docs/critical_path.md#critical-path)
 - [Power Control](docs/clock_throttling.md#clock-throttling)
 - [Branch Prediction](docs/branch_prediction.md#branch-prediction)
+- [Return Address Stack](docs/return_address_stack.md#return-address-stack)
 
 ## ISA Support
 
@@ -66,14 +69,14 @@ The core is written in Verilog HDL and targets FPGA and ASIC implementations. It
 
 | Metric | Value |
 | :--- | :--- |
-| CoreMark | 1448.624531 |
+| CoreMark | 1508.755307 |
 | Frequency | 500 MHz (simulated) |
-| CoreMark/MHz | 2.897 |
+| CoreMark/MHz | 3.017510614 |
 | Simulation | Gate-level, ideal memory |
-| Flags      | -march=rv32ib_zicond_zmmul_zicsr -mabi=ilp32 -O3 |
+| Flags      | -march=rv32ib_zicond_zmmul_zicsr_zca -mabi=ilp32 -Ofast |
 
 *Measured in gate-level simulation without cache/memory latency. Provides architectural comparison point.*
-*The design under test uses a Branch Target Buffer (BTB) with 4 entries (BRANCH_PREDICTION_ENTRY_INDEX_BITS = 2) and a Return Address Stack (RAS) with 2 entries (RETURN_ADDRESS_PREDICTION_ENTRY_INDEX_BITS = 1).*
+*The design under test uses a Branch Target Buffer (BTB) with 8 entries (BRANCH_PREDICTION_ENTRY_INDEX_BITS = 3) and a Return Address Stack (RAS) with 2 entries (RETURN_ADDRESS_PREDICTION_ENTRY_INDEX_BITS = 1).*
 
 
 ## Verification
@@ -90,10 +93,10 @@ The core is written in Verilog HDL and targets FPGA and ASIC implementations. It
 
 | Metric | Value |
 | :--- | :--- |
-| **Total Area** | 33.428 µm² |
-| **Cell Count** | 23,840 |
-| **KGE** | 12.56 kGE |
-| **Flip-Flops (DFFR/DFFS)** | 2,486 |
+| **Total Area** | 34,881.644 µm² |
+| **Cell Count** | 24,463 |
+| **KGE** | 13.105 kGE |
+| **Flip-Flops (DFFR/DFFS)** | 2730 |
 | **Synthesis Tool** | Yosys |
 |**Post-synthesis estimated Fmax** | 550 MHz |
 
