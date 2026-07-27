@@ -27,7 +27,7 @@ The Branch Prediction Unit contains multiple prediction entries. Each entry stor
 
 The total number of entries scales exponentially with the index parameter:
 
-$$\text{Number of entries} = 2^{\text{ENTRY INDEX BITS}}$$
+$$\text{Number of entries} = 2^{\text{ENTRY\_INDEX\_BITS}}$$
 
 ### Configuration Options
 
