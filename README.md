@@ -109,3 +109,12 @@ The figure below shows the top level organization of the SARV core. Detailed dow
        alt="SARV Architecture"
        width="900">
 </p>
+
+## License
+
+SARV is licensed under the **CERN Open Hardware Licence Version 2 – Strongly Reciprocal (CERN-OHL-S-2.0)**.
+
+You are free to use, modify, and manufacture hardware based on this project,
+provided you comply with the terms of the CERN-OHL-S v2.
+
+See the [LICENSE](LICENSE) file for details.

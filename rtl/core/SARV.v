@@ -1,4 +1,25 @@
 ////////////////////////////////////////////////////////////////////////////////
+// SARV RISC-V Core
+//
+// Copyright (C) 2026 Sayyid Amirreza Sayyid Torabi
+//
+// This source describes Open Hardware and is licensed under the
+// CERN-OHL-S v2.
+//
+// You may redistribute and modify this source and make products using it
+// under the terms of the CERN-OHL-S v2.
+//
+// This source is distributed WITHOUT ANY EXPRESS OR IMPLIED WARRANTY,
+// INCLUDING OF MERCHANTABILITY, SATISFACTORY QUALITY AND FITNESS FOR A
+// PARTICULAR PURPOSE. Please see the CERN-OHL-S v2 for applicable conditions.
+//
+// Source location:
+// https://github.com/sarst04/SARV
+//
+// As per CERN-OHL-S v2 section 4, should you produce hardware based on this
+// source, you must maintain the Source Location visible on the external case
+// of the product or in the documentation accompanying the product.
+//
 // File      : SARV.v
 // Author(s) : Sayyid Amirreza Sayyid Torabi <sayyidtorabi@gmail.com>
 // Date      : 2026-07-14 (last modified)
