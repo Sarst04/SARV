@@ -29,7 +29,7 @@ Unlike the branch predictor's tagged, PC-indexed table, the RAS has no per-entry
 
 The total stack depth scales exponentially with the index parameter:
 
-$$\text{Depth} = 2^{\text{ENTRY\_INDEX\_BITS}}$$
+$$\text{Depth} = 2^{\text{ENTRY INDEX BITS}}$$
 
 ### Configuration Options
 
