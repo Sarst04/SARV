@@ -498,7 +498,7 @@ module CSR_unit#(
 	);
 
 	assign 	mvendoridData 	= 32'b0 ;
-	assign 	marchidData 	= 32'b0;
+	assign 	marchidData 	= 32'b110111; // https://github.com/riscv/riscv-isa-manual/blob/main/marchid.md
 	assign 	mimpidData 		= 32'b0;
 	assign 	mhartidData 	= 32'b0;
 	assign 	mconfigptrData 	= 32'b0;
