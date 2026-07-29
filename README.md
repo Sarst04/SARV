@@ -76,6 +76,7 @@ The core is written in Verilog HDL and targets FPGA and ASIC implementations. It
 | Flags      | -march=rv32ib_zicond_zmmul_zicsr_zca -mabi=ilp32 -Ofast |
 
 *Measured in gate-level simulation without cache/memory latency. Provides architectural comparison point.*
+
 *The design under test uses a Branch Target Buffer (BTB) with 8 entries (BRANCH_PREDICTION_ENTRY_INDEX_BITS = 3) and a Return Address Stack (RAS) with 2 entries (RETURN_ADDRESS_PREDICTION_ENTRY_INDEX_BITS = 1).*
 
 
@@ -109,6 +110,27 @@ The figure below shows the top level organization of the SARV core. Detailed dow
        alt="SARV Architecture"
        width="900">
 </p>
+
+## Simulation
+
+The SARV core has been tested using:
+
+- **Simulator:** QuestaSim 2024.1
+
+### Compile
+
+```sh
+vlog rtl/*.v
+```
+
+### Run
+
+```sh
+vsim work.tb_top
+run -all
+```
+
+> **Note:** Before running the simulation, update the instruction memory initialization file (`memory.txt`) to point to your desired program image and current path.
 
 ## License
 
