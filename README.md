@@ -31,7 +31,8 @@ The core is written in Verilog HDL and targets FPGA and ASIC implementations. It
 
 | Sub-extension | Description | Status |
 | :--- | :--- | :--- |
-| Zca | Integer Compressed | Full |
+| Zca | Integer Compressed Instructions | Full |
+| Zcb | Additional Compressed Instructions | Full |
 
 ### Bit Manipulation (B)
 
@@ -40,6 +41,7 @@ The core is written in Verilog HDL and targets FPGA and ASIC implementations. It
 | Zba | Address Generation | Full |
 | Zbb | Basic Bit-Manipulation | Full |
 | Zbs | Single-Bit Operations | Full |
+| Zbc | Carry-less Multiplication | Full |
 
 ### Control & Status
 
@@ -85,7 +87,7 @@ The core is written in Verilog HDL and targets FPGA and ASIC implementations. It
 | Test Suite | Status |
 | :--- | :--- |
 | CoreMark | Pass |
-| Custom tests |  In progress |
+| Custom tests |  Pass |
 
 
 ## Synthesis Results
