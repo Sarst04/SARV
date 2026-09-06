@@ -1,12 +1,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 // File      : ALU.v
 // Author(s) : Sayyid Amirreza Sayyid Torabi <sayyidtorabi@gmail.com>
-// Date      : 2026-02-17 (last modified)
+// Date      : 2026-08-18 (last modified)
 // Description:
 //   
 ////////////////////////////////////////////////////////////////////////////////
 
-module ALU(
+module ALU #(
+	parameter ENABLE_CARRY_LESS_MULTIPLIER	= 0
+)(
 	input  wire [31:0] srcA,
 	input  wire [31:0] srcB,
 	input  wire [ 7:0] ALUOpcode,
@@ -25,9 +27,12 @@ module ALU(
     localparam 	BCLR  		= 8'b10110_001;
     localparam 	BINV  		= 8'b11110_001;
     localparam 	BSET  		= 8'b01110_001;
+	localparam 	CLMUL  		= 8'b00101_001;
     localparam 	SH1ADD  	= 8'b01000_010;
     localparam 	SLT  		= 8'b00000_010;
+	localparam 	CLMULR  	= 8'b00101_010;
     localparam 	SLTU 		= 8'b00000_011;
+	localparam 	CLMULH 		= 8'b00101_011;
     localparam 	ZEXTH  		= 8'b00100_100;
     localparam 	XOR  		= 8'b00000_100;
     localparam 	XNOR  		= 8'b10000_100;
@@ -120,9 +125,28 @@ module ALU(
 		.dataOut(shifterDataOut)
 	);
 
+	// Carry Less muliplier
+	reg		[31:0]	clmulSrcA;
+	reg		[31:0]	clmulSrcB;
+	reg		[ 1:0]	clmulOP;
+	wire	[31:0]	clmulDataOut;
+	localparam	CLMUL_OP	=	2'b00;
+	localparam	CLMULH_OP	=	2'b01;
+	localparam	CLMULR_OP	=	2'b10;
+    generate
+        if (ENABLE_CARRY_LESS_MULTIPLIER) begin : CLMUL_GEN
+            carry_less_multiplier CarryLessMultiplier(
+                .inA(clmulSrcA),
+                .inB(clmulSrcB),
+                .op(clmulOP),
+                .out(clmulDataOut)
+            );
+        end else begin : NO_CLMUL_GEN
+            assign clmulDataOut = 32'b0;
+        end
+    endgenerate
 
-	//always @(srcA, srcB, srcBInv, ALUOpcode, adderResult, carryOut, popCountOut, CTZOut, CLZOut, shifterDataOut) begin
-	always @(*) begin
+	always @(srcA, srcB, srcBInv, ALUOpcode, adderResult, carryOut, popCountOut, CTZOut, CLZOut, shifterDataOut, clmulDataOut) begin
 		// ALU result
 		result  		= 32'b0;	
 	
@@ -141,6 +165,11 @@ module ALU(
 		// Barrel Shifter
 		shifterDataIn	=	32'b0;
 		shifterOpcode	= 	3'b0;
+
+		// Carry Less muliplier
+    	clmulSrcA		=	32'b0;
+    	clmulSrcB		=	32'b0;
+    	clmulOP			=	2'b0;
 
 		case(ALUOpcode)
 			BYPASS_B : begin
@@ -313,6 +342,30 @@ module ALU(
 				shifterDataIn	= 32'b1;
 				shifterOpcode	= BARREL_OP_SLL;
 				result 			= srcA | shifterDataOut;
+			end
+			CLMUL:	begin
+                if (ENABLE_CARRY_LESS_MULTIPLIER) begin
+					clmulSrcA		= srcA;
+					clmulSrcB		= srcB;
+					clmulOP			= CLMUL_OP;
+					result			= clmulDataOut;
+				end
+			end
+			CLMULH:	begin
+                if (ENABLE_CARRY_LESS_MULTIPLIER) begin
+					clmulSrcA		= srcA;
+					clmulSrcB		= srcB;
+					clmulOP			= CLMULH_OP;
+					result			= clmulDataOut;
+				end
+			end
+			CLMULR:	begin
+                if (ENABLE_CARRY_LESS_MULTIPLIER) begin
+					clmulSrcA		= srcA;
+					clmulSrcB		= srcB;
+					clmulOP			= CLMULR_OP;
+					result			= clmulDataOut;
+				end
 			end
 			default :
 				result 			= 32'b0;

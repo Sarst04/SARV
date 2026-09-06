@@ -5,7 +5,9 @@
 // Description:
 //   
 ////////////////////////////////////////////////////////////////////////////////
-module execute_stage (
+module execute_stage  #(
+	parameter ENABLE_CARRY_LESS_MULTIPLIER	= 0
+)(
     input wire 		   clk,
     input wire 		   rst,
 
@@ -109,7 +111,8 @@ module execute_stage (
 		.takeBranch(takeBranch)
 	);
 
-	ALU alu (
+	ALU #(ENABLE_CARRY_LESS_MULTIPLIER)
+		alu (
 		.srcA(ALUSrcA),
 		.srcB(ALUSrcB),
 		.ALUOpcode(ALUOpcode_E_i),

@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // File      : ControlUnit.v
 // Author(s) : Sayyid Amirreza Sayyid Torabi <sayyidtorabi@gmail.com>
-// Date      : 2026-06-07 (last modified)
+// Date      : 2026-08-18 (last modified)
 // Description:
 //   
 ////////////////////////////////////////////////////////////////////////////////
@@ -63,9 +63,12 @@ module control_unit (
     localparam 	BCLR  		= 8'b10110_001;
     localparam 	BINV  		= 8'b11110_001;
     localparam 	BSET  		= 8'b01110_001;
+	localparam 	CLMUL  		= 8'b00101_001;
     localparam 	SH1ADD  	= 8'b01000_010;
     localparam 	SLT  		= 8'b00000_010;
+	localparam 	CLMULR  	= 8'b00101_010;
     localparam 	SLTU 		= 8'b00000_011;
+	localparam 	CLMULH 		= 8'b00101_011;
     localparam 	ZEXTH  		= 8'b00100_100;
     localparam 	XOR  		= 8'b00000_100;
     localparam 	XNOR  		= 8'b10000_100;
@@ -105,11 +108,14 @@ module control_unit (
     localparam F3_BINV     	= 3'b001;
     localparam F3_BSET     	= 3'b001;
 	localparam F3_MULH		= 3'b001;
+	localparam F3_CLMUL		= 3'b001;
     localparam F3_SLT		= 3'b010;
     localparam F3_SH1ADD	= 3'b010;
 	localparam F3_MULHSU	= 3'b010;
+	localparam F3_CLMULR	= 3'b010;
     localparam F3_SLTU     	= 3'b011;
 	localparam F3_MULHU		= 3'b011;
+	localparam F3_CLMULH	= 3'b011;
     localparam F3_ZEXTH		= 3'b100;
     localparam F3_XOR		= 3'b100;
     localparam F3_XNOR		= 3'b100;
@@ -153,6 +159,9 @@ module control_unit (
     localparam 	F7_MAXU    	= 7'b0000101;
     localparam 	F7_MIN    	= 7'b0000101;
     localparam 	F7_MINU    	= 7'b0000101;
+    localparam 	F7_CLMUL   	= 7'b0000101;
+    localparam 	F7_CLMULH   = 7'b0000101;
+    localparam 	F7_CLMULR   = 7'b0000101;
 	localparam	F7_ROL		= 7'b0110000;
 	localparam	F7_ROR		= 7'b0110000;
 	localparam 	F7_ORCB		= 7'b0010100;
@@ -305,13 +314,14 @@ module control_unit (
 										  	end
 						endcase
                     end
-                    F3_SLL, F3_ROL, F3_BCLR, F3_BINV, F3_BSET, F3_MULH : begin    
+                    F3_SLL, F3_ROL, F3_BCLR, F3_BINV, F3_BSET, F3_MULH, F3_CLMUL: begin    
 						case (funct7)
 							F7_SLL		: ALUOpcode = SLL;
 							F7_ROL		: ALUOpcode = ROL;
 							F7_BCLR		: ALUOpcode = BCLR;
 							F7_BINV		: ALUOpcode = BINV;
 							F7_BSET		: ALUOpcode = BSET;
+							F7_CLMUL	: ALUOpcode = CLMUL;
 							F7_MULH		: 	begin 	
 												mulEn				= 1'b1;
 												mulOpCode			= funct3[1:0];
@@ -319,10 +329,11 @@ module control_unit (
 										  	end
 						endcase
 					end
-                    F3_SLT, F3_SH1ADD, F3_MULHSU  : begin
+                    F3_SLT, F3_SH1ADD, F3_MULHSU, F3_CLMULR: begin
 						case (funct7)
 							F7_SLT		: ALUOpcode = SLT;
 							F7_SH1ADD	: ALUOpcode = SH1ADD;
+							F7_CLMULR	: ALUOpcode = CLMULR;
 							F7_MULHSU	: 	begin 	
 												mulEn				= 1'b1;
 												mulOpCode			= funct3[1:0];
@@ -330,9 +341,10 @@ module control_unit (
 										  	end
 						endcase
                     end
-                    F3_SLTU, F3_MULHU    : begin
+                    F3_SLTU, F3_MULHU, F3_CLMULH    : begin
 						case (funct7) 
 							F7_SLTU	 	: ALUOpcode = SLTU;
+							F7_CLMULH 	: ALUOpcode = CLMULH;
 							F7_MULHSU	: 	begin 	
 												mulEn				= 1'b1;
 												mulOpCode			= funct3[1:0];

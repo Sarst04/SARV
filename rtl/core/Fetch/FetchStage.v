@@ -15,6 +15,7 @@ module fetch_stage (
 	input  wire			disablePCAdder_F_i,
 	input  wire			disableInstLoad_F_i,
 	input  wire			predictTaken_F_i,
+	input  wire			unAlignFetch_F_i,
 	
 	output wire			instCountEn_F_o,
 	output wire			instMemWaitRequest_F_o,
@@ -40,15 +41,15 @@ module fetch_stage (
 
 	assign	PC_F_o					=	PC_F_i;
 	
-	wire		compressedFlag;    
+	wire		compressedFlag;  
 	wire [31:0] decompressInstruction;
 	wire [31:0] PCStep;
 
-	assign PCStep			= (compressedFlag == 0)	? 32'd4		  			: 32'd2;
-	assign instruction_F_o 	= (compressedFlag == 0)	? instructionMemoryData	: decompressInstruction;
+	assign PCStep				= (compressedFlag == 0)	? 32'd4		  			: 32'd2;
+	assign instruction_F_o 		= (compressedFlag == 0)	? instructionMemoryData	: decompressInstruction;
 
 	wire [31:0]	PCAdderInB;
-	assign	PCAdderInB		= (disablePCAdder_F_i == 0) ? PCStep			: 32'd0;
+	assign	PCAdderInB			= (disablePCAdder_F_i == 0) ? PCStep			: 32'd0;
 
  	return_detector ReturnDetector(
 		.instruction(instruction_F_o),
@@ -58,8 +59,11 @@ module fetch_stage (
 
 	
 	instruction_load_unit InstructionLoadUnit(
+		.clk(clk),
+		.rst(rst),
 		.waitRequest_F_i(instMemWaitRequest_F_i),
 		.disableInstLoad_F_i(disableInstLoad_F_i),
+		.unAlignFetch_F_i(unAlignFetch_F_i),
 
 		.waitRequest_F_o(instMemWaitRequest_F_o),
 
@@ -73,6 +77,7 @@ module fetch_stage (
 
 	decompress_controller DecompressController(
 		.instruction_F_i(instructionMemoryData),
+
 		.compressedFlag(compressedFlag)
 	);
 	

@@ -79,23 +79,23 @@ module pipe_manager_unit (
 
 	assign  loadWordStall			= memRead_E & ( (rs1Add_D == rd_E) | (rs2Add_D == rd_E) );
 	assign	multiplyStall			= ( (rs1Add_D == rd_E) | (rs2Add_D == rd_E)  ) & mulEn_X1_i;
-	assign 	disablePCAdder_F_i		= coldDownPipe_C_o | waitRequest_F_o;
+	assign 	disablePCAdder_F_i		= coldDownPipe_C_o;
 	assign  pauseCore				= pauseCore_E_o & (~coldDownPipe_C_o);
 	assign  fullPipeStall			= stallPipe_C_o;
-	assign  disableLoadStore_M_i	= stallPipe_C_o;
+	assign  disableLoadStore_M_i	= stallPipe_C_o | waitRequest_F_o;
 	assign  disableInstLoad_F_i		= stallPipe_C_o;
 
 	assign clear_F 					= 1'b0;
-	assign clear_D 					= (jumpOrBranchFlush_A_o | cleanPipe_C_o | coldDownPipe_C_o | waitRequest_F_o) 	& (~fullPipeStall) & (~waitRequest_M_o);
-	assign clear_EC 				= (jumpOrBranchFlush_A_o | cleanPipe_C_o | loadWordStall    | multiplyStall  ) 	& (~fullPipeStall) & (~waitRequest_M_o);
-	assign clear_MX 				= (pauseCore)																	& (~fullPipeStall) & (~waitRequest_M_o);
+	assign clear_D 					= (jumpOrBranchFlush_A_o | cleanPipe_C_o | coldDownPipe_C_o ) 					& (~fullPipeStall) & (~waitRequest_M_o) & (~waitRequest_F_o);
+	assign clear_EC 				= (jumpOrBranchFlush_A_o | cleanPipe_C_o | loadWordStall    | multiplyStall  ) 	& (~fullPipeStall) & (~waitRequest_M_o) & (~waitRequest_F_o);
+	assign clear_MX 				= (pauseCore)																	& (~fullPipeStall) & (~waitRequest_M_o) & (~waitRequest_F_o);
 	assign clear_W 					= 1'b0;
 
-	assign stall_F 					= loadWordStall | fullPipeStall   | waitRequest_M_o | pauseCore | multiplyStall;
-	assign stall_D 					= loadWordStall | fullPipeStall   | waitRequest_M_o | pauseCore | multiplyStall;
-	assign stall_EC 				= 				  fullPipeStall   | waitRequest_M_o | pauseCore;
-	assign stall_MX 				= 				  fullPipeStall   | waitRequest_M_o ;
-	assign stall_W 					= 				  fullPipeStall   | waitRequest_M_o ;
+	assign stall_F 					= waitRequest_F_o | fullPipeStall   | waitRequest_M_o | pauseCore | multiplyStall | loadWordStall;
+	assign stall_D 					= waitRequest_F_o | fullPipeStall   | waitRequest_M_o | pauseCore | multiplyStall | loadWordStall;
+	assign stall_EC 				= waitRequest_F_o | fullPipeStall   | waitRequest_M_o | pauseCore;
+	assign stall_MX 				= waitRequest_F_o | fullPipeStall   | waitRequest_M_o ;
+	assign stall_W 					= waitRequest_F_o | fullPipeStall   | waitRequest_M_o ;
 
 		
 	assign stallStatus				=	stall_F 	| stall_D 	| stall_EC 	| 	stall_MX 	| 	stall_W; 

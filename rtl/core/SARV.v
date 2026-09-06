@@ -1,25 +1,4 @@
 ////////////////////////////////////////////////////////////////////////////////
-// SARV RISC-V Core
-//
-// Copyright (C) 2026 Sayyid Amirreza Sayyid Torabi
-//
-// This source describes Open Hardware and is licensed under the
-// CERN-OHL-S v2.
-//
-// You may redistribute and modify this source and make products using it
-// under the terms of the CERN-OHL-S v2.
-//
-// This source is distributed WITHOUT ANY EXPRESS OR IMPLIED WARRANTY,
-// INCLUDING OF MERCHANTABILITY, SATISFACTORY QUALITY AND FITNESS FOR A
-// PARTICULAR PURPOSE. Please see the CERN-OHL-S v2 for applicable conditions.
-//
-// Source location:
-// https://github.com/sarst04/SARV
-//
-// As per CERN-OHL-S v2 section 4, should you produce hardware based on this
-// source, you must maintain the Source Location visible on the external case
-// of the product or in the documentation accompanying the product.
-//
 // File      : SARV.v
 // Author(s) : Sayyid Amirreza Sayyid Torabi <sayyidtorabi@gmail.com>
 // Date      : 2026-07-14 (last modified)
@@ -27,9 +6,11 @@
 //   
 ////////////////////////////////////////////////////////////////////////////////
 module SARV_Core #(
-	parameter		   HART_ID = 0,
-    parameter 		   BRANCH_PREDICTION_ENTRY_INDEX_BITS = 2,
-	parameter		   RETURN_ADDRESS_PREDICTION_ENTRY_INDEX_BITS = 1
+	parameter		   	HART_ID = 0,
+    parameter 		   	BRANCH_PREDICTION_ENTRY_INDEX_BITS = 3,
+	parameter		   	RETURN_ADDRESS_PREDICTION_ENTRY_INDEX_BITS = 1,
+	parameter 			ENABLE_CARRY_LESS_MULTIPLIER	= 1,
+	parameter			ENABLE_EMBEDDED_BASE			= 0
 )(
     input  wire 	   clk,
     input  wire 	   rst,
@@ -42,6 +23,7 @@ module SARV_Core #(
 	output wire 	   instructionMemoryReadRequest,
 	input  wire [31:0] instructionMemoryData,
 	input  wire		   instructionMemoryWaitRequest,
+	input  wire		   instructionMemoryUnalignedAccess,
 
 	output wire [31:0] memoryAddress,
 	output wire [31:0] memoryWriteData,
@@ -78,6 +60,7 @@ module SARV_Core #(
 	wire		disablePCAdder_F_i;
 	wire		disableInstLoad_F_i;
 	wire		predictTaken_F_i;
+	wire		unAlignFetch_F_i;
 
 	wire		instCountEn_F_o;
 	wire		instMemWaitRequest_F_o;
@@ -428,6 +411,7 @@ module SARV_Core #(
 		.disablePCAdder_F_i(disablePCAdder_F_i),
 		.disableInstLoad_F_i(disableInstLoad_F_i),
 		.predictTaken_F_i(predictTaken_F_i),
+		.unAlignFetch_F_i(unAlignFetch_F_i),
 
 		.instCountEn_F_o(instCountEn_F_o),
 		.instMemWaitRequest_F_o(instMemWaitRequest_F_o),
@@ -518,7 +502,8 @@ module SARV_Core #(
 	
 	assign	stageDEValid	=	stageSignalValid_E_i	|	stageSignalValid_D_i;
 
-	register_file #(32, 5, 32) RegFile(
+	localparam	REGFILE_REG_COUNT	= 	ENABLE_EMBEDDED_BASE ? 16 : 32;
+	register_file #(32, 5, REGFILE_REG_COUNT) RegFile(
 		.clk(clk),
 		.rst(rst),
 		.rs1_addr(rs1Addr_D_o),
@@ -535,7 +520,8 @@ module SARV_Core #(
 	assign		returnDetected_E_o_A_i = returnDetected_E_o & ~stall_EC;
 	assign		jumpDetect_E_o_A_i = jumpDetect_E_o & ~stall_EC;
 
-	execute_stage Execute(
+	execute_stage #(ENABLE_CARRY_LESS_MULTIPLIER)
+		Execute(
 		.clk(clk),
 		.rst(rst),
 		
@@ -816,6 +802,7 @@ module SARV_Core #(
 	assign instructionMemoryReadRequest 	= instructionMemoryReadRequest_F_o;
 	assign instructionMemoryData_F_i		= instructionMemoryData;
 	assign instMemWaitRequest_F_i			= instructionMemoryWaitRequest;
+	assign unAlignFetch_F_i					= instructionMemoryUnalignedAccess;
 
 	assign memoryAddress 					= memAddress_M_o;
 	assign memoryWriteData 					= memDataIn_M_o;
