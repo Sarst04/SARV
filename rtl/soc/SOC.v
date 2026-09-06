@@ -64,6 +64,7 @@ module SOC(
 		.instructionMemoryReadRequest(instructionMemoryReadRequest),
 		.instructionMemoryData(instructionMemoryData),
 		.instructionMemoryWaitRequest(instructionMemoryWaitRequest),
+		.instructionMemoryUnalignedAccess(1'b0),
 
 		.memoryAddress(MemoryAddress),
 		.memoryWriteData(MemoryWriteData),
