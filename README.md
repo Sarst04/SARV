@@ -105,7 +105,8 @@ The core is written in Verilog HDL and targets FPGA and ASIC implementations. It
 
 ## Architecture
 
-The figure below shows the top level organization of the SARV core. Detailed down to wire and module documentation are available in the `docs/` directory.
+The figure below shows the top level organization of the SARV core. Detailed down to wire and module documentation are available in the `docs/` directory:
+[complete schematic](docs/Schematic/schematic.pdf)
 
 <p align="center">
   <img src="docs/assets/schematicBigPicture.svg"
