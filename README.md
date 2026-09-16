@@ -48,7 +48,8 @@ The core is written in Verilog HDL and targets FPGA and ASIC implementations. It
 | Extension | Description | Status |
 | :--- | :--- | :--- |
 | **Zicsr** | Control Status Registers | Full |
-| **Zihpm** | Hardware Performance Monitors | Full |
+| **Zicntr** | Base Counters and Timers | Without RDTIME[H] |
+| **Zihpm** | Hardware Performance Monitors | Only mhpmcounter3-9 |
 
 ### Interrupts
 
@@ -66,8 +67,7 @@ The core is written in Verilog HDL and targets FPGA and ASIC implementations. It
 
 ---
 
-
-##  CoreMark Performance
+## CoreMark Performance
 
 | Metric | Value |
 | :--- | :--- |
