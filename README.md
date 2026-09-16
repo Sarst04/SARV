@@ -1,6 +1,6 @@
 # SARV A Risc-V
 <p align="center">
-  <img src="docs/assets/logo.png" alt="SARV32 Core Logo" width="800">
+  <img src="docs/assets/logo-gif.gif" alt="SARV32 Core Logo" width="900">
 </p>
 
 **SARV** is a 32-bit RISC-V processor implementing the RV32I base ISA together with selected standard extensions including Bit Manipulation (B), Compressed Instructions (C), Zmmul, Zicond, and Zicsr.
