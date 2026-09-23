@@ -129,7 +129,7 @@ Supervisor trap and interrupt handling is supported through the corresponding su
 | :--- | :--- |
 | **Total Area** | 38,354.008000 µm² |
 | **Cell Count** | 26,670 |
-| **KGE** | 48,06 kGE |
+| **KGE** | 48.06 kGE |
 | **Sequential Area** | 16,199.4 µm² (42.24%) |
 | **Synthesis Tool** | Yosys |
 | **Post-synthesis estimated Fmax** | 550 MHz |
