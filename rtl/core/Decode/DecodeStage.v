@@ -35,6 +35,7 @@ module decode_stage (
 	output wire		   predictTaken_D_o,
 	output wire		   returnDetected_D_o,
 	output wire		   RASTargetMatch_D_o,
+	output wire		   illegalInstruction_D_o,
 
 	// Data signal
     input wire  [31:0] nextPC_D_i,
@@ -53,7 +54,8 @@ module decode_stage (
 	output wire [ 4:0] rd_D_o,
 	output wire [ 4:0] rs1Addr_D_o,
 	output wire [ 4:0] rs2Addr_D_o,
-	output wire	[11:0] funct12_D_o
+	output wire	[11:0] funct12_D_o,
+	output wire	[ 6:0] instOpcode_D_o
 );
 	assign stageSignalValid_D_o		= stageSignalValid_D_i;
 	assign instCountEn_D_o			= instCountEn_D_i & (~stall_D_i);
@@ -65,6 +67,7 @@ module decode_stage (
 	wire [ 2:0] immExtendSelect;
 
 	control_unit Controler(
+		.instructionValid(stageSignalValid_D_i),
 		.opcode (instruction_D_i[ 6: 0]),
 		.funct3 (instruction_D_i[14:12]),
 		.funct5 (instruction_D_i[31:27]),
@@ -84,17 +87,19 @@ module decode_stage (
 		.system(system_D_o),
 		.pause(pause_D_o),
 		.mulOpCode(mulOpCode_D_o),
-		.mulEn(mulEn_D_o)
+		.mulEn(mulEn_D_o),
+		.illegalInstruction(illegalInstruction_D_o)
 	);
-	assign funct3_D_o  	= instruction_D_i[14:12];
+	assign funct3_D_o  		= instruction_D_i[14:12];
 
-	assign nextPC_D_o 	= nextPC_D_i;
-	assign PC_D_o 		= PC_D_i;
-	assign rd_D_o 		= instruction_D_i[11:7];
+	assign nextPC_D_o 		= nextPC_D_i;
+	assign PC_D_o 			= PC_D_i;
+	assign instOpcode_D_o	= instruction_D_i[ 6:0];
+	assign rd_D_o 			= instruction_D_i[11:7];
 
-	assign rs1Addr_D_o 	= instruction_D_i[19:15];
-	assign rs2Addr_D_o 	= instruction_D_i[24:20];
-	assign funct12_D_o 	= instruction_D_i[31:20];
+	assign rs1Addr_D_o 		= instruction_D_i[19:15];
+	assign rs2Addr_D_o 		= instruction_D_i[24:20];
+	assign funct12_D_o 		= instruction_D_i[31:20];
 
 	extend extendUnitDecode (
 		.instr(instruction_D_i),
@@ -102,7 +107,7 @@ module decode_stage (
 		.immExt(immExtend_D_o)
 	);
 
-	assign rs1Data_D_o 	= rs1Data_D_i;
-	assign rs2Data_D_o 	= rs2Data_D_i;
+	assign rs1Data_D_o 		= rs1Data_D_i;
+	assign rs2Data_D_o 		= rs2Data_D_i;
 
 endmodule

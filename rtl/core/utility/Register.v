@@ -5,7 +5,11 @@
 // Description:
 //   
 ////////////////////////////////////////////////////////////////////////////////
-module register #(parameter WIDTH = 8)(
+module register #(
+	parameter WIDTH = 8,
+	parameter RST_VALUE = {WIDTH{1'b0}}
+
+)(
     input wire clk,
     input wire rst,
     
@@ -17,7 +21,7 @@ module register #(parameter WIDTH = 8)(
 );
     always @(posedge clk, posedge rst) begin
         if (rst) begin
-            regOut <= {WIDTH{1'b0}};
+            regOut <= RST_VALUE;
         end else if (clear) begin
             regOut <= {WIDTH{1'b0}};
         end else if (enable) begin

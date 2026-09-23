@@ -18,14 +18,20 @@ module clint(
 	input  wire [31:0]	address,
 	input  wire [31:0]	dataIn,
 	
-	output reg  [31:0]	dataOut
+	output reg  [31:0]	dataOut,
+	output wire	[31:0]  mtimeData,
+	output wire	[31:0]  mtimehData
 );
+    localparam MSIP_ADDR_FROM_BASE 		= 32'h0000_0000;
     localparam MTIME_ADDR_FROM_BASE 	= 32'h0000_bff8;
     localparam MTIMECMP_ADDR_FROM_BASE 	= 32'h0000_4000;
 
 
 	reg [63:0] mtimeReg;
 	reg [63:0] mtimecmpReg;
+
+	assign mtimeData = mtimeReg[31:0];
+	assign mtimehData = mtimeReg[63:32];
 
 	assign MTI	=	(mtimeReg >= mtimecmpReg);
 

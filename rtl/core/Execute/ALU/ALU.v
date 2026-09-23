@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // File      : ALU.v
 // Author(s) : Sayyid Amirreza Sayyid Torabi <sayyidtorabi@gmail.com>
-// Date      : 2026-08-18 (last modified)
+// Date      : 2026-09-22 (last modified)
 // Description:
 //   
 ////////////////////////////////////////////////////////////////////////////////
@@ -142,7 +142,7 @@ module ALU #(
                 .out(clmulDataOut)
             );
         end else begin : NO_CLMUL_GEN
-            assign clmulDataOut = 32'b0;
+            assign clmulDataOut = srcA;
         end
     endgenerate
 
@@ -344,28 +344,22 @@ module ALU #(
 				result 			= srcA | shifterDataOut;
 			end
 			CLMUL:	begin
-                if (ENABLE_CARRY_LESS_MULTIPLIER) begin
-					clmulSrcA		= srcA;
-					clmulSrcB		= srcB;
-					clmulOP			= CLMUL_OP;
-					result			= clmulDataOut;
-				end
+				clmulSrcA		= srcA;
+				clmulSrcB		= srcB;
+				clmulOP			= CLMUL_OP;
+				result			= clmulDataOut;
 			end
 			CLMULH:	begin
-                if (ENABLE_CARRY_LESS_MULTIPLIER) begin
-					clmulSrcA		= srcA;
-					clmulSrcB		= srcB;
-					clmulOP			= CLMULH_OP;
-					result			= clmulDataOut;
-				end
+				clmulSrcA		= srcA;
+				clmulSrcB		= srcB;
+				clmulOP			= CLMULH_OP;
+				result			= clmulDataOut;
 			end
 			CLMULR:	begin
-                if (ENABLE_CARRY_LESS_MULTIPLIER) begin
-					clmulSrcA		= srcA;
-					clmulSrcB		= srcB;
-					clmulOP			= CLMULR_OP;
-					result			= clmulDataOut;
-				end
+				clmulSrcA		= srcA;
+				clmulSrcB		= srcB;
+				clmulOP			= CLMULR_OP;
+				result			= clmulDataOut;
 			end
 			default :
 				result 			= 32'b0;

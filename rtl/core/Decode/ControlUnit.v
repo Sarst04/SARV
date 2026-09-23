@@ -6,12 +6,12 @@
 //   
 ////////////////////////////////////////////////////////////////////////////////
 module control_unit (
+	input wire		  instructionValid,
     input wire [ 6:0] opcode,
 	input wire [ 2:0] funct3,
 	input wire [ 4:0] funct5,
 	input wire [ 6:0] funct7,
 	input wire [11:0] funct12,
-
 
 	output reg [ 2:0] immExtendSelect,
 	output reg        ALUSrcAType,
@@ -26,7 +26,8 @@ module control_unit (
 	output reg		  system,
 	output reg		  pause,
 	output reg [ 1:0] mulOpCode,
-	output reg		  mulEn
+	output reg		  mulEn,
+	output reg		  illegalInstruction
 );
 	// ALU SrcA Type
 	localparam	RS1 		= 1'b0;
@@ -200,9 +201,9 @@ module control_unit (
 	localparam MISC_MEM			= 7'b00_011_11;
 
 
-	always @(opcode, funct3, funct5, funct7, funct12) begin
-		{immExtendSelect, ALUSrcAType, ALUSrcBType  , ALUOpcode, memWrite, memRead, regWrite, jump, branch, writeBackSrcSelect, system, pause, mulEn, mulOpCode} = 
-		{ 3'b000		, 1'b0		 , 1'b0		    , 8'b0	   , 1'b0	 , 1'b0	  , 1'b0	, 1'b0, 1'b0  , 2'b0			  , 1'b0  , 1'b0 , 1'b0 , 2'b0     } ;
+	always @(opcode, funct3, funct5, funct7, funct12, instructionValid) begin
+		{immExtendSelect, ALUSrcAType, ALUSrcBType  , ALUOpcode, memWrite, memRead, regWrite, jump, branch, writeBackSrcSelect, system, pause, mulEn, mulOpCode, illegalInstruction} = 
+		{ 3'b000		, 1'b0		 , 1'b0		    , 8'b0	   , 1'b0	 , 1'b0	  , 1'b0	, 1'b0, 1'b0  , 2'b0			  , 1'b0  , 1'b0 , 1'b0 , 2'b0	   , 1'b0     } ;
 
         case (opcode)
             LOAD : begin
@@ -419,6 +420,7 @@ module control_unit (
 					pause				= 1'b1;
 				end
 			end
+			default : illegalInstruction = instructionValid;
 		endcase
 	end
 

@@ -3,7 +3,7 @@
   <img src="docs/assets/logo-gif.gif" alt="SARV32 Core Logo" width="900">
 </p>
 
-**SARV** is a 32-bit RISC-V processor implementing the RV32I base ISA together with selected standard extensions including Bit Manipulation (B), Compressed Instructions (C), Zmmul, Zicond, and Zicsr.
+**SARV** is a 32-bit RISC-V processor based on the RV32I ISA. It currently supports **B**, **C**, **Zmmul**, **Zicond**, **Zicsr**, **Zicntr**, **Zihpm**, and **Zihintpause**, together with **machine**, **supervisor**, and **user** privilege modes.
 
 The core is written in Verilog HDL and targets FPGA and ASIC implementations. It is designed as a compact embedded processor with a modular RTL architecture.
 
@@ -48,22 +48,49 @@ The core is written in Verilog HDL and targets FPGA and ASIC implementations. It
 | Extension | Description | Status |
 | :--- | :--- | :--- |
 | **Zicsr** | Control Status Registers | Full |
-| **Zicntr** | Base Counters and Timers | Without RDTIME[H] |
+| **Zicntr** | Base Counters and Timers | Full |
 | **Zihpm** | Hardware Performance Monitors | Only mhpmcounter3-9 |
+
+## Privilege Modes
+
+SARV currently implements the three standard RISC-V privilege modes:
+
+| Mode | Description | Status |
+| :--- | :--- | :--- |
+| **M-mode** | Machine mode | Supported |
+| **S-mode** | Supervisor mode | Supported |
+| **U-mode** | User mode | Supported |
+
+Supervisor trap and interrupt handling is supported through the corresponding supervisor CSRs and delegation mechanisms.
 
 ### Interrupts
 
-| Type | Description | Status |
+### Machine Interrupts
+
+| Interrupt | Description | Status |
 | :--- | :--- | :--- |
 | MEI | Machine External Interrupt | Supported |
 | MTI | Machine Timer Interrupt | Supported |
 | MSI | Machine Software Interrupt | Supported |
+
+### Supervisor Interrupts
+
+| Interrupt | Description | Status |
+| :--- | :--- | :--- |
+| SEI | Supervisor External Interrupt | Supported |
+| STI | Supervisor Timer Interrupt | Supported |
+| SSI | Supervisor Software Interrupt | Supported |
+
+- Supervisor interrupt delegation is handled through `mideleg`.
+- SARV includes support for the **Supervisor-level Timer Compare extension (Sstc)**.
+
 
 ### Power Management
 
 | Feature | Description | Status |
 | :--- | :--- | :--- |
 | **WFI** | Wait for Interrupt — halts core until IRQ | Supported |
+| Clock throttling | Runtime control of switching activity | Supported |
 
 ---
 
@@ -79,16 +106,20 @@ The core is written in Verilog HDL and targets FPGA and ASIC implementations. It
 
 *Measured in gate-level simulation without cache/memory latency. Provides architectural comparison point.*
 
-*The design under test uses a Branch Target Buffer (BTB) with 8 entries (BRANCH_PREDICTION_ENTRY_INDEX_BITS = 3) and a Return Address Stack (RAS) with 2 entries (RETURN_ADDRESS_PREDICTION_ENTRY_INDEX_BITS = 1).*
+*The design under test uses:*
 
+- A Branch Target Buffer (BTB) with 8 entries (`BRANCH_PREDICTION_ENTRY_INDEX_BITS = 3`).
+- A Return Address Stack (RAS) with 2 entries (`RETURN_ADDRESS_PREDICTION_ENTRY_INDEX_BITS = 1`).
+- `ENABLE_CARRY_LESS_MULTIPLIER = 1`.
+- `ENABLE_EMBEDDED_BASE = 0`.
 
 ## Verification
 
 | Test Suite | Status |
 | :--- | :--- |
 | CoreMark | Pass |
-| Custom tests |  Pass |
-
+| unprivilege Custom tests | Pass |
+| M/S/U privilege Custom tests | Pass |
 
 ## Synthesis Results
 
@@ -96,12 +127,12 @@ The core is written in Verilog HDL and targets FPGA and ASIC implementations. It
 
 | Metric | Value |
 | :--- | :--- |
-| **Total Area** | 34,881.644 µm² |
-| **Cell Count** | 24,463 |
-| **KGE** | 13.105 kGE |
-| **Flip-Flops (DFFR/DFFS)** | 2730 |
+| **Total Area** | 38,354.008000 µm² |
+| **Cell Count** | 26,670 |
+| **KGE** | 48,06 kGE |
+| **Sequential Area** | 16,199.4 µm² (42.24%) |
 | **Synthesis Tool** | Yosys |
-|**Post-synthesis estimated Fmax** | 550 MHz |
+| **Post-synthesis estimated Fmax** | 550 MHz |
 
 ## Architecture
 

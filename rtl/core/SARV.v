@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // File      : SARV.v
 // Author(s) : Sayyid Amirreza Sayyid Torabi <sayyidtorabi@gmail.com>
-// Date      : 2026-07-14 (last modified)
+// Date      : 2026-09-22 (last modified)
 // Description:
 //   
 ////////////////////////////////////////////////////////////////////////////////
@@ -16,9 +16,10 @@ module SARV_Core #(
     input  wire 	   rst,
 	
 	input  wire		   MEI,
+	input  wire		   SEI,
 	input  wire		   MTI,
 	input  wire		   MSI,
-	
+
 	output wire [31:0] instructionMemoryAddress,
 	output wire 	   instructionMemoryReadRequest,
 	input  wire [31:0] instructionMemoryData,
@@ -31,8 +32,10 @@ module SARV_Core #(
 	output wire [ 1:0] memoryAccessType,
 	output wire 	   memoryWriteRequest,
 	output wire 	   memoryReadRequest,
-	input  wire		   memoryWaitRequest
+	input  wire		   memoryWaitRequest,
 
+	input  wire [31:0] mtimeData,
+	input  wire [31:0] mtimehData
 );
 
 	// Address Generation Stage
@@ -103,6 +106,7 @@ module SARV_Core #(
 	wire		predictTaken_D_o;
 	wire		returnDetected_D_o;
 	wire		RASTargetMatch_D_o;
+	wire		illegalInstruction_D_o;
 
 	// Data signall
 	wire [31:0] nextPC_D_i;
@@ -120,6 +124,7 @@ module SARV_Core #(
 	wire [ 4:0] rs1Addr_D_o;
 	wire [ 4:0] rs2Addr_D_o;
 	wire [11:0] funct12_D_o;
+	wire [ 6:0] instOpcode_D_o;
 
 	// Execute Stage
 	// Control signal
@@ -289,6 +294,7 @@ module SARV_Core #(
 	wire		system_C_i;
 	wire		instCountEn_C_i;
 	wire [ 4:0]	pmCounterEn_C_i;
+	wire		illegalInstruction_C_i;
 
 	wire		stallPipe_C_o;
 	wire		changeExeSrc_C_o;
@@ -296,9 +302,11 @@ module SARV_Core #(
 
 	// Data signal
 	wire [31:0] rs1Data_C_i;
+	wire [ 6:0] instOpcode_C_i;
 	wire [11:0] funct12_C_i;
 
 	wire [31:0] rdData_C_o;
+	
 
 	// stage Valid
 	wire		stageDEValid;
@@ -470,6 +478,7 @@ module SARV_Core #(
 		.predictTaken_D_o(predictTaken_D_o),
 		.returnDetected_D_o(returnDetected_D_o),
 		.RASTargetMatch_D_o(RASTargetMatch_D_o),
+		.illegalInstruction_D_o(illegalInstruction_D_o),
 
 		.nextPC_D_i(nextPC_D_i),
 		.PC_D_i(PC_D_i),
@@ -486,7 +495,8 @@ module SARV_Core #(
 		.rd_D_o(rd_D_o),
 		.rs1Addr_D_o(rs1Addr_D_o),
 		.rs2Addr_D_o(rs2Addr_D_o),
-		.funct12_D_o(funct12_D_o)
+		.funct12_D_o(funct12_D_o),
+		.instOpcode_D_o(instOpcode_D_o)
 	);
 
 	register #(204) Execute_Reg (
@@ -578,15 +588,15 @@ module SARV_Core #(
 		.rs1Data_E_o(rs1Data_E_o)
 	);
 
-	register #(13) CSR_Reg (
+	register #(21) CSR_Reg (
         .clk(clk),
         .rst(rst),
         .enable(~stall_EC),
         .clear(clear_EC),
-        .regIn( {system_D_o,
-				 funct12_D_o}),
-        .regOut({system_C_i, 
-				 funct12_C_i})
+        .regIn( {system_D_o, illegalInstruction_D_o,
+				 funct12_D_o, instOpcode_D_o}),
+        .regOut({system_C_i, illegalInstruction_C_i,
+				 funct12_C_i, instOpcode_C_i})
     );
 
 	assign rs1Data_C_i		=	rs1Data_E_o;
@@ -598,6 +608,7 @@ module SARV_Core #(
 		.rst(rst),
 
 		.MEI(MEI),
+		.SEI(SEI),
 		.MTI(MTI),
 		.MSI(MSI),
 
@@ -611,6 +622,7 @@ module SARV_Core #(
 		.changeExeSrc_C_o(changeExeSrc_C_o),
 		.cleanPipe_C_o(cleanPipe_C_o),
 		.pmCounterEn_C_i(pmCounterEn_C_i),
+		.illegalInstruction_C_i(illegalInstruction_C_i),
 		
 		.PC_E_o_C_i(PC_E_i),
 		.PC_A_o_C_i(selectedPC_A_o),
@@ -618,6 +630,9 @@ module SARV_Core #(
 		.rdAddr_C_i(rd_E_i),
 		.uimm_C_i(rs1Addr_E_i),
 		.funct12_C_i(funct12_C_i),
+		.instOpcode_C_i(instOpcode_C_i),
+		.mtimeData(mtimeData),
+		.mtimehData(mtimehData),
 		.rdData_C_o(rdData_C_o),
 		.PCTarget_C_o(PCTarget_C_o_A_i)
 	);

@@ -1,12 +1,19 @@
 ////////////////////////////////////////////////////////////////////////////////
 // File      : CSRReadUnit.v
 // Author(s) : Sayyid Amirreza Sayyid Torabi <sayyidtorabi@gmail.com>
-// Date      : 2026-06-15 (last modified)
+// Date      : 2026-09-19 (last modified)
 // Description:
 //   
 ////////////////////////////////////////////////////////////////////////////////
 module CSR_read_unit(
 	input wire  [11:0] CSRAddr,
+
+	input wire  [31:0] ucycleData,
+	input wire  [31:0] ucyclehData,
+	input wire  [31:0] utimeData,
+	input wire  [31:0] utimehData,
+	input wire  [31:0] uinstretData,
+	input wire [ 31:0] uinstrethData,
 	
 	input wire	[31:0] mvendoridData,	
 	input wire	[31:0] marchidData,	
@@ -16,6 +23,8 @@ module CSR_read_unit(
 
 	input wire	[31:0] mstatusData,
 	input wire	[31:0] misaData,	
+	input wire	[31:0] medelegData,
+	input wire	[31:0] midelegData,
 	input wire	[31:0] mieData,	
 	input wire	[31:0] mtvecData,	
 	input wire	[31:0] mscratchData,	
@@ -39,8 +48,28 @@ module CSR_read_unit(
 	input wire	[ 3:0] mcpirateData,
 	input wire	[ 7:0] mcpictrlData,
 
+	input wire	[31:0] sstatusData,
+	input wire	[31:0] sieData,
+	input wire	[31:0] stvecData,
+	input wire	[31:0] sscratchData,
+	input wire	[31:0] sepcData,
+	input wire	[31:0] scauseData,
+	input wire	[31:0] stvalData,
+	input wire	[31:0] sipData,
+	input wire	[31:0] stimecmpData,
+	input wire	[31:0] stimecmphData,
+
+
 	output reg  [31:0] selectedData
 );
+	
+	localparam  ucycle   		= 	12'hC00;
+	localparam  utime    		= 	12'hC01;
+	localparam  uinstret 		= 	12'hC02;
+
+	localparam  ucycleh   		= 	12'hC80;
+	localparam  utimeh    		= 	12'hC81;
+	localparam  uinstreth 		= 	12'hC82;
 
 	localparam 	mvendorid 		=	12'hF11;
 	localparam 	marchid	 		=	12'hF12;
@@ -50,6 +79,8 @@ module CSR_read_unit(
 	
 	localparam 	mstatus 		=	12'h300;
 	localparam 	misa	 		=	12'h301;
+	localparam 	medeleg 		=	12'h302;
+	localparam 	mideleg 		=	12'h303;
 	localparam 	mie	 			=	12'h304;
 	localparam 	mtvec	 		=	12'h305;
 
@@ -76,13 +107,37 @@ module CSR_read_unit(
 	localparam	mcpirate		=	12'h7C0;
 	localparam	mcpictrl		=	12'h7C4;
 
+	localparam	sstatus			=	12'h100;
+	localparam	sie				=	12'h104;
+	localparam	stvec			=	12'h105;
+
+	localparam	sscratch		=	12'h140;
+	localparam	sepc			=	12'h141;
+	localparam	scause			=	12'h142;
+	localparam	stval			=	12'h143;
+	localparam	sip				=	12'h144;
+
+	localparam	stimecmp		=	12'h14D;
+	localparam	stimecmph		=	12'h15D;
+
 	
 	always @(CSRAddr, mvendoridData, marchidData, mimpidData, mhartidData, mconfigptrData, mstatusData, misaData,
-			 mieData, mtvecData, mscratchData, mepcData, mcauseData, mtvalData, mipData, mcycleData, mcyclehData,
-			 minstretData, minstrethData, mhpmcounter3Data, mhpmcounter4Data, mhpmcounter5Data, mhpmcounter6Data,
-			mhpmcounter7Data, mhpmcounter8Data, mhpmcounter9Data, mcountinhibitData, mcpirateData, mcpictrlData) begin
+			 medelegData, midelegData, mieData, mtvecData, mscratchData, mepcData, mcauseData, mtvalData, mipData, 
+			 mcycleData, mcyclehData, minstretData, minstrethData, mhpmcounter3Data, mhpmcounter4Data, mhpmcounter5Data,
+			 mhpmcounter6Data, mhpmcounter7Data, mhpmcounter8Data, mhpmcounter9Data, mcountinhibitData, mcpirateData, 
+			 mcpictrlData, sstatusData, sieData, stvecData, sscratchData, sepcData, scauseData, stvalData, sipData,
+			 stimecmpData, stimecmphData, ucycleData, ucyclehData, utimeData, utimehData, uinstretData, uinstrethData) begin
 		selectedData = 32'b0;
 		case (CSRAddr) 
+	    	ucycle			: selectedData = ucycleData;
+    		utime			: selectedData = utimeData;
+    		uinstret		: selectedData = uinstretData;
+			
+    		ucycleh			: selectedData = ucyclehData;
+    		utimeh			: selectedData = utimehData;
+    		uinstreth		: selectedData = uinstrethData;
+	
+	
 			mvendorid 		: selectedData = mvendoridData;
 			marchid 		: selectedData = marchidData;
 			mimpid			: selectedData = mimpidData;
@@ -91,6 +146,8 @@ module CSR_read_unit(
 
 			mstatus 		: selectedData = mstatusData;
 			misa 			: selectedData = misaData;
+			medeleg 		: selectedData = medelegData;
+			mideleg 		: selectedData = midelegData;
 			mie 			: selectedData = mieData;
 			mtvec 			: selectedData = mtvecData;
 
@@ -115,6 +172,19 @@ module CSR_read_unit(
 	
 			mcpirate		: selectedData = {28'b0, mcpirateData};
 			mcpictrl		: selectedData = {24'b0, mcpictrlData};
+
+			sstatus			: selectedData = sstatusData;
+			sie				: selectedData = sieData;
+			stvec			: selectedData = stvecData;
+
+			sscratch		: selectedData = sscratchData;
+			sepc			: selectedData = sepcData;
+			scause			: selectedData = scauseData;
+			stval			: selectedData = stvalData;
+			sip				: selectedData = sipData;
+
+			stimecmp		: selectedData = stimecmpData;
+			stimecmph		: selectedData = stimecmphData;
 		endcase
 	end
 endmodule

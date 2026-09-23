@@ -1,11 +1,10 @@
 ////////////////////////////////////////////////////////////////////////////////
-// File      : CSRYnit.v
+// File      : CSRunit.v
 // Author(s) : Sayyid Amirreza Sayyid Torabi <sayyidtorabi@gmail.com>
-// Date      : 2026-06-15 (last modified)
+// Date      : 2026-09-20 (last modified)
 // Description:
 //   CSR top module 
 ////////////////////////////////////////////////////////////////////////////////
-
 module CSR_unit#(
 	parameter	HART_ID = 0,
 	parameter 	MHPM_COUNTER_SIZE = 12
@@ -15,6 +14,7 @@ module CSR_unit#(
 	
 	// Control signal
 	input  wire 		MEI,
+	input  wire 		SEI,
 	input  wire 		MTI,
 	input  wire 		MSI,
 	input  wire [ 2:0] 	funct3_C_i,
@@ -22,6 +22,7 @@ module CSR_unit#(
 	input  wire		    instCountEn_C_i,
 	input  wire			stageDEMWValid_C_i,
 	input  wire	[ 4:0]	pmCounterEn_C_i,
+	input  wire			illegalInstruction_C_i,
 
 	output wire			cleanPipe_C_o,
 	output wire 		stallPipe_C_o,
@@ -30,12 +31,15 @@ module CSR_unit#(
 	output wire			changeExeSrc_C_o,
 
 	// Data signal
+	input  wire [ 6:0]  instOpcode_C_i,
 	input  wire [31:0]  PC_E_o_C_i,
 	input  wire [31:0]  PC_A_o_C_i,
 	input  wire [31:0]  rs1Data_C_i,
 	input  wire [ 4:0] 	rdAddr_C_i,
 	input  wire [ 4:0] 	uimm_C_i,
 	input  wire [11:0]	funct12_C_i,
+	input  wire [31:0] 	mtimeData,
+	input  wire [31:0] 	mtimehData,
 
 	output wire [31:0] 	rdData_C_o,
 	output wire [31:0] 	PCTarget_C_o
@@ -44,10 +48,18 @@ module CSR_unit#(
 	wire [31:0]	CSRData;
 	wire [11:0]	CSRAddr;
 
+	wire		STI;
 	wire [31:0]	mipInput;
-	assign		mipInput	=	{20'b0, MEI, 3'b0, MTI, 3'b0, MSI, 3'b0};
+	assign		mipInput	=	{20'b0, MEI, 1'b0, SEI, 1'b0, MTI, 1'b0, STI, 1'b0, MSI, 1'b0, 1'b0, 1'b0};
 
 	// CSR registers
+	wire [31:0] ucycleData;
+	wire [31:0] ucyclehData;
+	wire [31:0] utimeData;
+	wire [31:0] utimehData;
+	wire [31:0] uinstretData;
+	wire [31:0] uinstrethData;
+
 	wire [31:0] mvendoridData;
 	wire [31:0] marchidData;
 	wire [31:0] mimpidData;
@@ -60,6 +72,10 @@ module CSR_unit#(
 	wire [31:0] misaData;
 	wire [31:0] mieData;
 	wire		mieEn;
+	wire [31:0] medelegData;
+	wire		medelegEn;
+	wire [31:0] midelegData;
+	wire		midelegEn;
 	wire [31:0] mtvecData;
 	wire		mtvecEn;
 	wire [31:0] mscratchData;
@@ -76,6 +92,7 @@ module CSR_unit#(
 	wire		mtvalEn;
 	wire [31:0] mtvalIn;
 	wire		mtvalEn2;
+	wire		mipEn;
 	wire [31:0] mipData;
 
 	wire 		mcycleEn;
@@ -109,6 +126,40 @@ module CSR_unit#(
 	wire		mcpictrlEn;
 	wire [ 7:0]	mcpictrlData;
 
+	wire [31:0] sstatusData;
+	wire		sstatusEn;
+	wire [31:0] sieData;
+	wire		sieEn;
+	wire [31:0] stvecData;
+	wire		stvecEn;
+
+	wire [31:0] sscratchData;
+	wire		sscratchEn;
+	wire [31:0] sepcData;
+	wire		sepcEn;
+	wire [31:0] sepcIn;
+	wire		sepcEn2;
+	wire [31:0] scauseData;
+	wire		scauseEn;
+	wire [31:0] scauseIn;
+	wire		scauseEn2;
+	wire [31:0] stvalData;
+	wire		stvalEn;
+	wire [31:0] stvalIn;
+	wire		stvalEn2;
+	wire [31:0] sipData;
+	wire		sipEn;
+
+	wire [31:0] stimecmpData;
+	wire		stimecmpEn;
+	wire [31:0] stimecmphData;
+	wire		stimecmphEn;
+
+	// current Privilege
+	wire 	   newCurPrivEn;
+	wire [1:0] newCurPriv;
+	wire [1:0] curPriv;
+
 	// CSR Controller
 	wire		PassCSRData;
 	wire		PassCSRAddr;
@@ -116,14 +167,19 @@ module CSR_unit#(
 	wire		CSRDataSelect;
 	wire		ecall;
 	wire		mret;
+	wire		sret;
 	wire		wfi;
 	wire		CSRAccess;
+	wire		illegalCSRAccess;
 
-	wire		return;
+	wire		mreturn;
+	wire		sreturn;
+	wire		delegate;
 
 	//CSR Inter Interrupt Controller
 	wire		raiseInterrupt;
 	wire		irqReady;
+	wire		delegated;
 	wire [31:0]	interruptCause;
 
 	// stall Pipe
@@ -131,55 +187,88 @@ module CSR_unit#(
 	wire		stallPipeCPIUnit;
 	assign		stallPipe_C_o	=	stallPipeSleepingUnit	|	stallPipeCPIUnit;
 	
-	assign	minstretCountEnable	=	instCountEn_C_i;
+	assign		minstretCountEnable	=	instCountEn_C_i;
 
 	wire		systemOrTrapCe;
 
+	
+	wire		illegalInstruction;
+	assign		illegalInstruction = illegalInstruction_C_i | illegalCSRAccess;
+
+	wire [31:0]	illegalInstructionData;
+	assign		illegalInstructionData = {funct12_C_i, uimm_C_i, funct3_C_i, rdAddr_C_i, instOpcode_C_i};
+
  	CSR_trap_handler CSRTrapHandler(
 		.mret(mret),
+		.sret(sret),
 		.ecall(ecall),
 		.raiseInterrupt(raiseInterrupt),
-		.return(return),
+		.curPriv(curPriv),
+		.delegated(delegated),
+		.illegalInstruction(illegalInstruction),
+		.illegalInstructionData(illegalInstructionData),
+		.mreturn(mreturn),
+		.sreturn(sreturn),
 		.mcauseEn(mcauseEn2),
 		.mtvalEn(mtvalEn2),
 		.mepcEn(mepcEn2),
 		.mstatusEn(mstatusEn2),
+		.scauseEn(scauseEn2),
+		.stvalEn(stvalEn2),
+		.sepcEn(sepcEn2),
 		.changePCSrc(changePCSrc_C_o),
 		.cleanPipe(cleanPipe_C_o),
+		.newCurPrivEn(newCurPrivEn),
+		.delegate(delegate),
 
 		.interruptCause(interruptCause),
 		.mstatus(mstatusData),
 
 		.PC_E_o(PC_E_o_C_i),
 		.PC_A_o(PC_A_o_C_i),
+		.medelegData(medelegData),
 		.mcauseNewData(mcauseIn),
 		.mtvalNewData(mtvalIn),
 		.mepcNewData(mepcIn),
-		.mstatusNewData(mstatusIn)
+		.scauseNewData(scauseIn),
+		.stvalNewData(stvalIn),
+		.sepcNewData(sepcIn),
+		.mstatusNewData(mstatusIn),
+		.newCurPriv(newCurPriv)
 	);
 
-	assign	systemOrTrapCe	= mret | ecall | raiseInterrupt;
+	assign	systemOrTrapCe	= mret | sret | ecall | raiseInterrupt | illegalInstruction;
 
 	CSR_inter_interrupt_controller	CSRinterInterruptController (
 		.clk(clk),
 		.rst(rst),
-
+		
+		.curPriv(curPriv),
 		.mip(mipData),
 		.mie(mieData),
+		.sip(sipData),
+		.sie(sieData),
+		.midelegData(midelegData),
 		.mstatusMIE(mstatusData[3]),
+		.mstatusSIE(mstatusData[1]),
 		.stageDEMWValid(stageDEMWValid_C_i),
 
 		.coldDownPipe(coldDownPipe_C_o),
 		.raiseInterrupt(raiseInterrupt),
 		.irqReady(irqReady),
+		.delegated(delegated),
 		.interruptCause(interruptCause)
 	);
 
 	CSR_traps_pc_generator CSRTrapsPCGenerator (
-		.return(return),
+		.mreturn(mreturn),
+		.sreturn(sreturn),
+		.interruptCause(interruptCause),
+		.delegate(delegate),
 		.mtvec(mtvecData),
-		.mcause(mcauseData),
 		.mepc(mepcData),
+		.stvec(stvecData),
+		.sepc(sepcData),
 		.targetPC(PCTarget_C_o)
 	);
 
@@ -188,15 +277,18 @@ module CSR_unit#(
 		.systemInst(systemInst_C_i),
 		.operation(operation),
 		.CSRAccess(CSRAccess),
+		.illegalCSRAccess(illegalCSRAccess),
 		.PassCSRData(PassCSRData),
 		.PassCSRAddr(PassCSRAddr),
 		.changeExeSrc(changeExeSrc_C_o),
 		.CSRDataSelect(CSRDataSelect),
 		.ecall(ecall),
 		.mret(mret),
+		.sret(sret),
 		.wfi(wfi),
 		.funct12(funct12_C_i),
-		.rdAddr(rdAddr_C_i)
+		.curPriv(curPriv),
+		.rs1Addr(uimm_C_i)
 	);
 
 	CSR_sleeping_unit CSRSleepingUnit(
@@ -211,12 +303,34 @@ module CSR_unit#(
     	.clk(clk),
 		.rst(rst),
 
-		.priv(2'b0),
+		.priv(curPriv),
 		.CPIRate(mcpirateData),
 		.CPICTRL(mcpictrlData),
 
-
 		.stallCore(stallPipeCPIUnit)
+	);
+
+	CSR_sstc_unit CSRsstcUnit(
+    	.clk(clk),
+		.rst(rst),
+
+		.STI,
+		
+		.stimecmp(stimecmpData),
+		.stimehcmp(stimecmphData),
+
+		.mtime(mtimeData),
+		.mtimeh(mtimehData)
+	);
+
+ 	register #(2, 2'b11) currentPrivilege (
+    	.clk(clk),
+		.rst(rst),
+
+        .enable(newCurPrivEn),
+        .clear(1'b0),
+        .regIn({newCurPriv}),
+        .regOut({curPriv})
 	);
 
 	assign CSRAddr	=	(PassCSRAddr == 1'b1 ) ? funct12_C_i : 32'b0;
@@ -229,12 +343,15 @@ module CSR_unit#(
 		.lastData(rdData_C_o),
 		.newData(CSRWtiteData),
 		.mstatusEn(mstatusEn),
+		.medelegEn(medelegEn),
+		.midelegEn(midelegEn),
 		.mieEn(mieEn),
 		.mtvecEn(mtvecEn),
 		.mscratchEn(mscratchEn),
 		.mepcEn(mepcEn),
 		.mcauseEn(mcauseEn),
 		.mtvalEn(mtvalEn),
+		.mipEn(mipEn),
 		.mcycleEn(mcycleEn),
 		.mcyclehEn(mcyclehEn),
 		.minstretEn(minstretEn),
@@ -248,27 +365,62 @@ module CSR_unit#(
 		.mhpmcounter9En(mhpmcounter9En),
 		.mcountinhibitEn(mcountinhibitEn),
 		.mcpirateEn(mcpirateEn),
-		.mcpictrlEn(mcpictrlEn)
+		.mcpictrlEn(mcpictrlEn),
+		.sstatusEn(sstatusEn),
+		.sieEn(sieEn),
+		.stvecEn(stvecEn),
+		.sscratchEn(sscratchEn),
+		.sepcEn(sepcEn),
+		.scauseEn(scauseEn),
+		.stvalEn(stvalEn),
+		.sipEn(sipEn),
+		.stimecmpEn(stimecmpEn),
+		.stimecmphEn(stimecmphEn)
 	);
 
- 	dualPortRegister #(32, 32'b0) mstatus (
+	localparam SSTATUS_MASK  =  32'h800C_0122;
+ 	triplePortRegister #(32, 32'b0) mstatus (
     	.clk(clk),
 		.rst(rst),
 		.en1(mstatusEn),
 		.dataIn1(CSRWtiteData),
 		.en2(mstatusEn2),
 		.dataIn2(mstatusIn),
+		.en3(sstatusEn),
+		.dataIn3((CSRWtiteData & SSTATUS_MASK) | (mstatusData & ~SSTATUS_MASK)),
 		.dataOut(mstatusData)
 	);
+	assign sstatusData	= mstatusData & SSTATUS_MASK;
 
- 	register #(32) mie (
+ 	register #(32) medeleg (
     	.clk(clk),
 		.rst(rst),
-        .enable(mieEn),
+        .enable(medelegEn),
         .clear(1'b0),
         .regIn({CSRWtiteData}),
-        .regOut({mieData})
+        .regOut({medelegData})
 	);
+
+ 	register #(32) mideleg (
+    	.clk(clk),
+		.rst(rst),
+        .enable(midelegEn),
+        .clear(1'b0),
+        .regIn({CSRWtiteData}),
+        .regOut({midelegData})
+	);
+
+	localparam SIE_MASK  =  32'h0000_0222;
+ 	dualPortRegister #(32, 32'b0) mie (
+    	.clk(clk),
+		.rst(rst),
+		.en1(mieEn),
+		.dataIn1(CSRWtiteData),
+		.en2(sieEn),
+		.dataIn2((CSRWtiteData & SIE_MASK & midelegData) | (mieData & ~SIE_MASK)),
+		.dataOut(mieData)
+	);
+	assign	sieData =  mieData & midelegData & SIE_MASK;
 
  	register #(32) mtvec (
     	.clk(clk),
@@ -317,15 +469,21 @@ module CSR_unit#(
 		.dataIn2(mtvalIn),
 		.dataOut(mtvalData)
 	);
-
- 	register #(32) mip (
+	
+	localparam [31:0] SIP_MASK 			= 32'h0000_0222;
+	localparam [31:0] SIP_WRITE_MASK 	= 32'h0000_0002;
+ 	triplePortRegister #(32, 32'b0) mip (
     	.clk(clk),
 		.rst(rst),
-        .enable(1'b1),
-        .clear(1'b0),
-        .regIn({mipInput}),
-        .regOut({mipData})
+		.en1(mipEn),
+		.dataIn1(CSRWtiteData),
+		.en2(~mipEn),
+		.dataIn2((mipInput & ~SIP_WRITE_MASK) |(mipData & SIP_WRITE_MASK)),
+		.en3(sipEn),
+		.dataIn3((CSRWtiteData & SIP_WRITE_MASK & midelegData) | (mipData & ~SIP_WRITE_MASK)),
+		.dataOut(mipData)
 	);
+	assign sipData = mipData & SIP_MASK;
 
  	CSR_dual_counter minstret(
     	.clk(clk),
@@ -458,9 +616,91 @@ module CSR_unit#(
 
 	);
 
+	register #(32) stvec (
+		.clk(clk),
+		.rst(rst),
+		.enable(stvecEn),
+		.clear(1'b0),
+		.regIn(CSRWtiteData),
+		.regOut(stvecData)
+	);
+
+	register #(32) sscratch (
+		.clk(clk),
+		.rst(rst),
+		.enable(sscratchEn),
+		.clear(1'b0),
+		.regIn(CSRWtiteData),
+		.regOut(sscratchData)
+	);
+
+ 	dualPortRegister #(32, 32'b0) sepc (
+    	.clk(clk),
+		.rst(rst),
+		.en1(sepcEn),
+		.dataIn1(CSRWtiteData),
+		.en2(sepcEn2),
+		.dataIn2(sepcIn),
+		.dataOut(sepcData)
+	);
+
+ 	dualPortRegister #(32, 32'b0) scause (
+    	.clk(clk),
+		.rst(rst),
+		.en1(scauseEn),
+		.dataIn1(CSRWtiteData),
+		.en2(scauseEn2),
+		.dataIn2(scauseIn),
+		.dataOut(scauseData)
+	);
+
+
+ 	dualPortRegister #(32, 32'b0) stval (
+    	.clk(clk),
+		.rst(rst),
+		.en1(stvalEn),
+		.dataIn1(CSRWtiteData),
+		.en2(stvalEn2),
+		.dataIn2(stvalIn),
+		.dataOut(stvalData)
+	);
+
+	register #(32) stimecmp (
+		.clk(clk),
+		.rst(rst),
+		.enable(stimecmpEn),
+		.clear(1'b0),
+		.regIn(CSRWtiteData),
+		.regOut(stimecmpData)
+	);
+
+	register #(32) stimecmph (
+		.clk(clk),
+		.rst(rst),
+		.enable(stimecmphEn),
+		.clear(1'b0),
+		.regIn(CSRWtiteData),
+		.regOut(stimecmphData)
+	);
+
+	assign	ucycleData 		= mcycleData;
+	assign	ucyclehData 	= mcyclehData;
+	assign	utimeData 		= mtimeData;
+	assign	utimehData 		= mtimehData;
+	assign	uinstretData 	= minstretData;
+	assign	uinstrethData	= minstrethData;
+
 
 	CSR_read_unit CSRReadUnit(
 		.CSRAddr(CSRAddr),
+
+		.ucycleData(ucycleData),
+		.ucyclehData(ucyclehData),
+		.utimeData(utimeData),
+		.utimehData(utimehData),
+		.uinstretData(uinstretData),
+		.uinstrethData(uinstrethData),
+
 		.mvendoridData(mvendoridData),
 		.marchidData(marchidData),
 		.mimpidData(mimpidData),
@@ -469,6 +709,8 @@ module CSR_unit#(
 
 		.mstatusData(mstatusData),
 		.misaData(misaData),
+		.medelegData(medelegData),
+		.midelegData(midelegData),
 		.mieData(mieData),
 		.mtvecData(mtvecData),
 
@@ -494,10 +736,24 @@ module CSR_unit#(
 		.mcpirateData(mcpirateData),
 		.mcpictrlData(mcpictrlData),
 
+		.sstatusData(sstatusData),
+		.sieData(sieData),
+		.stvecData(stvecData),
+
+		.sscratchData(sscratchData),
+		.sepcData(sepcData),
+		.scauseData(scauseData),
+		.stvalData(stvalData),
+		.sipData(sipData),
+
+		.stimecmpData(stimecmpData),
+		.stimecmphData(stimecmphData),
+
 		.selectedData(rdData_C_o)
 	);
 
-	assign 	mvendoridData 	= 32'b0;	
+
+	assign 	mvendoridData 	= 32'b0 ;
 	assign 	marchidData 	= 32'b110111; // https://github.com/riscv/riscv-isa-manual/blob/main/marchid.md
 	assign 	mimpidData 		= 32'b0;
 	assign 	mhartidData 	= 32'b0;

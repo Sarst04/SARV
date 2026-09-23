@@ -28,6 +28,8 @@ module SOC(
 	wire		MemoryWaitRequest;
 
 	wire		MTI;
+	wire [31:0] mtimeData;   
+	wire [31:0] mtimehData;  
 
 
 	wire		dataMemorySelect;
@@ -72,7 +74,10 @@ module SOC(
 		.memoryWriteRequest(MemoryWriteRequest),
 		.memoryReadRequest(MemoryReadRequest),
 		.memoryReadData(MemoryReadData),
-		.memoryWaitRequest(MemoryWaitRequest)
+		.memoryWaitRequest(MemoryWaitRequest),
+
+		.mtimeData(mtimeData),
+		.mtimehData(mtimehData)
 	);
 
 	instructionMemoryModel #(INSTRUCTION_MEMORY_END_ADDR - INSTRUCTION_MEMORY_BASE_ADDR) instructionMem(
@@ -116,7 +121,9 @@ module SOC(
 		.MTI(MTI),
 		.address(MemoryAddress - CLINT_BASE_ADDR),
 		.dataIn(MemoryWriteData),
-		.dataOut(clintReadData)
+		.dataOut(clintReadData),
+		.mtimeData(mtimeData),
+		.mtimehData(mtimehData)
 	);
 
 endmodule
