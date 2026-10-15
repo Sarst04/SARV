@@ -27,6 +27,7 @@ module control_unit (
 	output reg		  pause,
 	output reg [ 1:0] mulOpCode,
 	output reg		  mulEn,
+	output reg		  atomic,
 	output reg		  illegalInstruction
 );
 	// ALU SrcA Type
@@ -50,6 +51,7 @@ module control_unit (
 	localparam	B_TYPE		= 3'b010;
 	localparam	J_TYPE		= 3'b011;
 	localparam	U_TYPE		= 3'b100;
+	localparam	ZERO_IMM	= 3'b111;
 
     // ALU Opcodes 
     localparam 	ADD  		= 8'b00000_000;
@@ -198,12 +200,13 @@ module control_unit (
 	localparam AUIPC 			= 7'b00_101_11;
 	localparam LUI 				= 7'b01_101_11;
 	localparam SYSTEM			= 7'b11_100_11;
+	localparam ATOMIC			= 7'b01_011_11;
 	localparam MISC_MEM			= 7'b00_011_11;
 
 
 	always @(opcode, funct3, funct5, funct7, funct12, instructionValid) begin
-		{immExtendSelect, ALUSrcAType, ALUSrcBType  , ALUOpcode, memWrite, memRead, regWrite, jump, branch, writeBackSrcSelect, system, pause, mulEn, mulOpCode, illegalInstruction} = 
-		{ 3'b000		, 1'b0		 , 1'b0		    , 8'b0	   , 1'b0	 , 1'b0	  , 1'b0	, 1'b0, 1'b0  , 2'b0			  , 1'b0  , 1'b0 , 1'b0 , 2'b0	   , 1'b0     } ;
+		{immExtendSelect, ALUSrcAType, ALUSrcBType  , ALUOpcode, memWrite, memRead, regWrite, jump, branch, writeBackSrcSelect, system, pause, mulEn, mulOpCode, illegalInstruction, atomic} = 
+		{ 3'b000		, 1'b0		 , 1'b0		    , 8'b0	   , 1'b0	 , 1'b0	  , 1'b0	, 1'b0, 1'b0  , 2'b0			  , 1'b0  , 1'b0 , 1'b0 , 2'b0	   , 1'b0     		   , 1'b0  } ;
 
         case (opcode)
             LOAD : begin
@@ -414,6 +417,17 @@ module control_unit (
 				system 				= 1'b1;
                 regWrite        	= 1'b1;
                 writeBackSrcSelect 	= EXE_RESULT;
+			end
+			ATOMIC :begin
+				atomic				= 1'b1;
+                immExtendSelect 	= ZERO_IMM;
+				ALUSrcAType			= RS1;
+                ALUSrcBType	    	= Immediate;
+                ALUOpcode       	= ADD;
+                regWrite        	= 1'b1;
+                writeBackSrcSelect 	= MemDataOut;
+				memRead				= 1'b1;
+				memWrite			= 1'b1;
 			end
 			MISC_MEM:begin
 				if (funct12[4]) begin

@@ -14,6 +14,9 @@ module SOC(
 	localparam	CLINT_END_ADDR					= CLINT_BASE_ADDR + 32'hBFFF;
 
 
+	wire 		atomic;
+	wire [ 4:0] atomicOpcode;
+
 	wire [31:0] instructionMemoryAddress;
 	wire [31:0] instructionMemoryData;
 	wire 		instructionMemoryWaitRequest;
@@ -77,7 +80,11 @@ module SOC(
 		.memoryWaitRequest(MemoryWaitRequest),
 
 		.mtimeData(mtimeData),
-		.mtimehData(mtimehData)
+		.mtimehData(mtimehData),
+
+		.atomic(atomic),
+		.atomicOpcode(atomicOpcode)
+
 	);
 
 	instructionMemoryModel #(INSTRUCTION_MEMORY_END_ADDR - INSTRUCTION_MEMORY_BASE_ADDR) instructionMem(

@@ -34,6 +34,15 @@ The core is written in Verilog HDL and targets FPGA and ASIC implementations. It
 | Zca | Integer Compressed Instructions | Full |
 | Zcb | Additional Compressed Instructions | Full |
 
+### Atomic Instructions (A)
+
+| Sub-extension | Description | Status |
+| :--- | :--- | :--- |
+| Zalrcs | Load-Reserved/Store-Conditional Instructions | Full |
+| Zammo | Atomic Memory Operations | Full |
+
+*Atomic instructions are passed through the pipeline and handled by the data cach*
+
 ### Bit Manipulation (B)
 
 | Sub-extension | Description | Status |
@@ -83,7 +92,6 @@ Supervisor trap and interrupt handling is supported through the corresponding su
 
 - Supervisor interrupt delegation is handled through `mideleg`.
 - SARV includes support for the **Supervisor-level Timer Compare extension (Sstc)**.
-
 
 ### Power Management
 

@@ -11,12 +11,16 @@ module load_store_unit(
 	input  wire		   	memWrite_M_i,
 	input  wire			waitRequest_M_i,
 	input  wire	[ 2:0]	funct3_M_i,
+	input  wire	[ 4:0]	funct5_M_i,
 	input  wire			disableLoadStore,
+	input  wire			atomic_M_i,
 
 	output wire			memRead_M_o,
 	output wire			memWrite_M_o,
 	output wire			waitRequest_M_o,
 	output wire	[ 1:0]	memAccessType_M_o,
+	output wire			atomic_M_o,
+	output wire	[ 4:0]	atomicOpcode_M_o,
 	
 	// Data signal
 	input  wire [31:0] 	exeResult_M_i,
@@ -36,10 +40,12 @@ module load_store_unit(
 
 	assign	memAddress_M_o		=	exeResult_M_i;
 	assign	memDataIn_M_o		=	rs2Data_M_i;
-	assign 	memRead_M_o			=	memRead_M_i  & (disableLoadStore == 1'b0);
-	assign 	memWrite_M_o		=	memWrite_M_i & (disableLoadStore == 1'b0);
+	assign 	memRead_M_o			=	memRead_M_i  & (disableLoadStore == 1'b0) & ~atomic_M_o;
+	assign 	memWrite_M_o		=	memWrite_M_i & (disableLoadStore == 1'b0) & ~atomic_M_o;
 	assign  waitRequest_M_o 	=   waitRequest_M_i;
 	assign  memAccessType_M_o	=	funct3_M_i[1:0];
+	assign  atomicOpcode_M_o	=   funct5_M_i;
+	assign  atomic_M_o			=	atomic_M_i;
 	
 
 	always @(memDataOut_M_i,  funct3_M_i, memRead_M_i) begin

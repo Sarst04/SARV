@@ -25,12 +25,14 @@ module execute_stage  #(
 	input  wire 	   branch_E_i,
 	input  wire [ 1:0] writeBackSrcSelect_E_i,
 	input  wire [ 2:0] funct3_E_i,
+	input  wire [ 4:0] funct5_E_i,
 	input  wire [ 1:0] forwardA_E_i,
 	input  wire [ 1:0] forwardB_E_i,
 	input  wire		   pause_E_i,
 	input  wire		   predictTaken_E_i,
 	input  wire		   returnDetected_E_i,
 	input  wire		   RASTargetMatch_E_i,
+	input  wire		   atomic_E_i,
 
 	output wire		   instCountEn_E_o,
 	output wire		   stageSignalValid_E_o,
@@ -41,11 +43,13 @@ module execute_stage  #(
 	output wire		   branchTakenDetect_E_o_A_i,
 	output wire [ 1:0] writeBackSrcSelect_E_o,
 	output wire [ 2:0] funct3_E_o,
+	output wire [ 4:0] funct5_E_o,
 	output wire		   pauseCore_E_o,
 	output wire		   predictTaken_E_o,
 	output wire		   callDetected_E_o,
 	output wire		   returnDetected_E_o,
 	output wire		   RASTargetMatch_E_o,
+	output wire		   atomic_E_o,
 
 	// Data signal
 	input  wire [31:0] nextPC_E_i,
@@ -126,9 +130,11 @@ module execute_stage  #(
 
 	assign memWrite_E_o 			= memWrite_E_i;
 	assign memRead_E_o 				= memRead_E_i;
+	assign atomic_E_o				= atomic_E_i;
 	assign regWrite_E_o 			= regWrite_E_i;
 	assign writeBackSrcSelect_E_o 	= writeBackSrcSelect_E_i;
 	assign funct3_E_o				= funct3_E_i;
+	assign funct5_E_o				= funct5_E_i;
 	
 	assign nextPC_E_o 				= nextPC_E_i;
 	assign rs2Data_E_o 				= rs2Data;

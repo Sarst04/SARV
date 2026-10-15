@@ -17,18 +17,22 @@ module memory_stage (
 	input  wire 	    regWrite_M_i,
 	input  wire  [ 1:0] writeBackSrcSelect_M_i,
 	input  wire  [ 2:0] funct3_M_i,
+	input  wire  [ 4:0] funct5_M_i,
 	input  wire			waitRequest_M_i,
 	input  wire		    stageSignalValid_M_i,
 	input  wire			disableLoadStore_M_i,
+	input  wire			atomic_M_i,
 
 	output wire		  	instCountEn_M_o,
 	output wire 	    memWrite_M_o,
 	output wire 	    memRead_M_o,
 	output wire 	    regWrite_M_o,
-	output  wire [ 1:0] writeBackSrcSelect_M_o,
+	output wire  [ 1:0] writeBackSrcSelect_M_o,
 	output wire			waitRequest_M_o,
 	output wire	 [ 1:0] memAccessType_M_o,
 	output wire		    stageSignalValid_M_o,
+	output wire			atomic_M_o,
+	output wire  [ 4:0] atomicOpcode_M_o,
 
 	
 	// Data signal
@@ -63,11 +67,15 @@ module memory_stage (
 		.waitRequest_M_i(waitRequest_M_i),
 		.funct3_M_i(funct3_M_i),
 		.disableLoadStore(disableLoadStore_M_i),
+		.atomic_M_i(atomic_M_i),
+		.funct5_M_i(funct5_M_i),
 
 		.memRead_M_o(memRead_M_o),
 		.memWrite_M_o(memWrite_M_o),
 		.waitRequest_M_o(waitRequest_M_o),
 		.memAccessType_M_o(memAccessType_M_o),
+		.atomicOpcode_M_o(atomicOpcode_M_o),
+		.atomic_M_o(atomic_M_o),
 
 		.exeResult_M_i(exeResult_M_i),
 		.rs2Data_M_i(rs2Data_M_i),

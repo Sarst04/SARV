@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // File      : SARV.v
 // Author(s) : Sayyid Amirreza Sayyid Torabi <sayyidtorabi@gmail.com>
-// Date      : 2026-09-22 (last modified)
+// Date      : 2026-09-28 (last modified)
 // Description:
 //   
 ////////////////////////////////////////////////////////////////////////////////
@@ -35,7 +35,10 @@ module SARV_Core #(
 	input  wire		   memoryWaitRequest,
 
 	input  wire [31:0] mtimeData,
-	input  wire [31:0] mtimehData
+	input  wire [31:0] mtimehData,
+
+	output wire		   atomic,
+	output wire	[ 4:0] atomicOpcode
 );
 
 	// Address Generation Stage
@@ -99,6 +102,7 @@ module SARV_Core #(
 	wire 		memRead_D_o;
 	wire 		regWrite_D_o;
 	wire [ 2:0] funct3_D_o;
+	wire [ 4:0] funct5_D_o;
 	wire [ 1:0] writeBackSrcSelect_D_o;
 	wire		system_D_o;
 	wire		stageSignalValid_D_o;
@@ -106,6 +110,7 @@ module SARV_Core #(
 	wire		predictTaken_D_o;
 	wire		returnDetected_D_o;
 	wire		RASTargetMatch_D_o;
+	wire		atomic_D_o;
 	wire		illegalInstruction_D_o;
 
 	// Data signall
@@ -140,12 +145,14 @@ module SARV_Core #(
 	wire 		memRead_E_i;
 	wire 		regWrite_E_i;
 	wire [ 2:0] funct3_E_i;
+	wire [ 4:0] funct5_E_i;
 	wire [ 1:0] writeBackSrcSelect_E_i;
 	wire		stageSignalValid_E_i;
 	wire		pause_E_i;
 	wire		predictTaken_E_i;
 	wire		returnDetected_E_i;
 	wire		RASTargetMatch_E_i;
+	wire		atomic_E_i;
 
 	wire		jumpDetect_E_o;
 	wire		instCountEn_E_o;
@@ -154,12 +161,14 @@ module SARV_Core #(
 	wire 		memWrite_E_o;
 	wire 		memRead_E_o;
 	wire [ 2:0] funct3_E_o;
+	wire [ 4:0] funct5_E_o;
 	wire		stageSignalValid_E_o;
 	wire		pauseCore_E_o;
 	wire		predictTaken_E_o;
 	wire		returnDetected_E_o;
 	wire		callDetected_E_o_A_i;
 	wire		RASTargetMatch_E_o;
+	wire		atomic_E_o;
 
 	// Data signal
 	wire [31:0] nextPC_E_i;
@@ -207,9 +216,11 @@ module SARV_Core #(
 	wire 		memWrite_M_i;
 	wire 		memRead_M_i;
 	wire [ 2:0] funct3_M_i;
+	wire [ 4:0] funct5_M_i;
 	wire		waitRequest_M_i;
 	wire		stageSignalValid_M_i;
 	wire		disableLoadStore_M_i;
+	wire		atomic_M_i;
 
 	wire		instCountEn_M_o;
 	wire [ 1:0] writeBackSrcSelect_M_o;
@@ -469,7 +480,8 @@ module SARV_Core #(
 		.memWrite_D_o(memWrite_D_o),
 		.memRead_D_o(memRead_D_o),
 		.regWrite_D_o(regWrite_D_o),	
-		.funct3_D_o(funct3_D_o),
+		.funct3_D_o(funct3_D_o),	
+		.funct5_D_o(funct5_D_o),
 		.writeBackSrcSelect_D_o(writeBackSrcSelect_D_o),
 		.system_D_o(system_D_o),
 		.pause_D_o(pause_D_o),
@@ -478,6 +490,7 @@ module SARV_Core #(
 		.predictTaken_D_o(predictTaken_D_o),
 		.returnDetected_D_o(returnDetected_D_o),
 		.RASTargetMatch_D_o(RASTargetMatch_D_o),
+		.atomic_D_o(atomic_D_o),
 		.illegalInstruction_D_o(illegalInstruction_D_o),
 
 		.nextPC_D_i(nextPC_D_i),
@@ -499,14 +512,14 @@ module SARV_Core #(
 		.instOpcode_D_o(instOpcode_D_o)
 	);
 
-	register #(204) Execute_Reg (
+	register #(210) Execute_Reg (
         .clk(clk),
         .rst(rst),
         .enable(~stall_EC),
         .clear(clear_EC),
-        .regIn( {instCountEn_D_o, ALUSrcAType_D_o, ALUSrcBType_D_o, ALUOpcode_D_o, memWrite_D_o, memRead_D_o, regWrite_D_o,funct3_D_o, jump_D_o, branch_D_o, writeBackSrcSelect_D_o, stageSignalValid_D_o, pause_D_o, mulEn_D_o,  mulOpCode_D_o , predictTaken_D_o, returnDetected_D_o, RASTargetMatch_D_o 
+        .regIn( {instCountEn_D_o, ALUSrcAType_D_o, ALUSrcBType_D_o, ALUOpcode_D_o, memWrite_D_o, memRead_D_o, regWrite_D_o,funct3_D_o,funct5_D_o , jump_D_o, branch_D_o, writeBackSrcSelect_D_o, stageSignalValid_D_o, pause_D_o, mulEn_D_o,  mulOpCode_D_o , predictTaken_D_o, returnDetected_D_o, RASTargetMatch_D_o, atomic_D_o 
 				,PC_D_o, nextPC_D_o, rs1Data_D_o, rs2Data_D_o, immExtend_D_o, rd_D_o, rs1Addr_D_o, rs2Addr_D_o}),
-        .regOut({instCountEn_E_i, ALUSrcAType_E_i, ALUSrcBType_E_i, ALUOpcode_E_i, memWrite_E_i, memRead_E_i, regWrite_E_i,funct3_E_i, jump_E_i, branch_E_i, writeBackSrcSelect_E_i, stageSignalValid_E_i, pause_E_i, mulEn_X1_i, mulOpCode_X1_i, predictTaken_E_i, returnDetected_E_i, RASTargetMatch_E_i
+        .regOut({instCountEn_E_i, ALUSrcAType_E_i, ALUSrcBType_E_i, ALUOpcode_E_i, memWrite_E_i, memRead_E_i, regWrite_E_i,funct3_E_i,funct5_E_i , jump_E_i, branch_E_i, writeBackSrcSelect_E_i, stageSignalValid_E_i, pause_E_i, mulEn_X1_i, mulOpCode_X1_i, predictTaken_E_i, returnDetected_E_i, RASTargetMatch_E_i, atomic_E_i
 				,PC_E_i, nextPC_E_i, rs1Data_E_i, rs2Data_E_i, immExtend_E_i, rd_E_i, rs1Addr_E_i, rs2Addr_E_i})
     );
 	
@@ -548,12 +561,14 @@ module SARV_Core #(
 		.jump_E_i(jump_E_i),
 		.writeBackSrcSelect_E_i(writeBackSrcSelect_E_i),
 		.funct3_E_i(funct3_E_i),
+		.funct5_E_i(funct5_E_i),
 		.forwardA_E_i(forwardA_E_i),
 		.forwardB_E_i(forwardB_E_i),
 		.pause_E_i(pause_E_i),
 		.predictTaken_E_i(predictTaken_E_i),
 		.returnDetected_E_i(returnDetected_E_i),
 		.RASTargetMatch_E_i(RASTargetMatch_E_i),
+		.atomic_E_i(atomic_E_i),
 
 		.instCountEn_E_o(instCountEn_E_o),
 		.memWrite_E_o(memWrite_E_o),
@@ -563,12 +578,14 @@ module SARV_Core #(
 		.branchTakenDetect_E_o_A_i(branchTakenDetect_E_o_A_i),
 		.writeBackSrcSelect_E_o(writeBackSrcSelect_E_o),
 		.funct3_E_o(funct3_E_o),
+		.funct5_E_o(funct5_E_o),
 		.stageSignalValid_E_o(stageSignalValid_E_o),
 		.pauseCore_E_o(pauseCore_E_o),
 		.predictTaken_E_o(predictTaken_E_o),
 		.callDetected_E_o(callDetected_E_o_A_i),
 		.returnDetected_E_o(returnDetected_E_o),
 		.RASTargetMatch_E_o(RASTargetMatch_E_o_A_i),
+		.atomic_E_o(atomic_E_o),
 
 		.nextPC_E_i(nextPC_E_i),
 		.rs1Data_E_i(rs1Data_E_i),
@@ -640,15 +657,15 @@ module SARV_Core #(
 	assign PCTarget_E_o_A_i =  	ALUResult_E_o;
 	assign exeResult_E_o	=	(changeExeSrc_C_o == 1'b0) ? ALUResult_E_o 	  : rdData_C_o;
 
-	register #(111) Memory_Reg (
+	register #(117) Memory_Reg (
         .clk(clk),
         .rst(rst),
         .enable(~stall_MX),
         .clear(clear_MX),
-        .regIn( {instCountEn_E_o, writeBackSrcSelect_E_o, regWrite_E_o, memWrite_E_o, memRead_E_o, funct3_E_o, stageSignalValid_E_o
+        .regIn( {instCountEn_E_o, writeBackSrcSelect_E_o, regWrite_E_o, memWrite_E_o, memRead_E_o, funct3_E_o, funct5_E_o, stageSignalValid_E_o, atomic_E_o
 				 ,nextPC_E_o, exeResult_E_o, rs2Data_E_o, rd_E_o}),
 
-        .regOut({instCountEn_M_i, writeBackSrcSelect_M_i, regWrite_M_i, memWrite_M_i, memRead_M_i, funct3_M_i, stageSignalValid_M_i
+        .regOut({instCountEn_M_i, writeBackSrcSelect_M_i, regWrite_M_i, memWrite_M_i, memRead_M_i, funct3_M_i, funct5_M_i, stageSignalValid_M_i, atomic_M_i
 				 ,nextPC_M_i, exeResult_M_i, rs2Data_M_i, rd_M_i})
     );
 
@@ -667,9 +684,11 @@ module SARV_Core #(
 		.regWrite_M_i(regWrite_M_i),
 		.writeBackSrcSelect_M_i(writeBackSrcSelect_M_i),
 		.funct3_M_i(funct3_M_i),
+		.funct5_M_i(funct5_M_i),
 		.waitRequest_M_i(waitRequest_M_i),
 		.stageSignalValid_M_i(stageSignalValid_M_i),
 		.disableLoadStore_M_i(disableLoadStore_M_i),
+		.atomic_M_i(atomic_M_i),
 
 		.instCountEn_M_o(instCountEn_M_o),
 		.memWrite_M_o(memWrite_M_o),
@@ -679,6 +698,8 @@ module SARV_Core #(
 		.memAccessType_M_o(memAccessType_M_o),
 		.waitRequest_M_o(waitRequest_M_o),
 		.stageSignalValid_M_o(stageSignalValid_M_o),
+		.atomic_M_o(atomic),
+		.atomicOpcode_M_o(atomicOpcode),
 
 		.nextPC_M_i(nextPC_M_i),
 		.exeResult_M_i(exeResult_M_i),

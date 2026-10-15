@@ -28,6 +28,7 @@ module decode_stage (
 	output wire 	   branch_D_o,
 	output wire [ 1:0] writeBackSrcSelect_D_o,
 	output wire [ 2:0] funct3_D_o,
+	output wire [ 4:0] funct5_D_o,
 	output wire		   system_D_o,
 	output wire		   pause_D_o,
 	output wire		   mulEn_D_o,
@@ -35,6 +36,7 @@ module decode_stage (
 	output wire		   predictTaken_D_o,
 	output wire		   returnDetected_D_o,
 	output wire		   RASTargetMatch_D_o,
+	output wire		   atomic_D_o,
 	output wire		   illegalInstruction_D_o,
 
 	// Data signal
@@ -88,9 +90,11 @@ module decode_stage (
 		.pause(pause_D_o),
 		.mulOpCode(mulOpCode_D_o),
 		.mulEn(mulEn_D_o),
+		.atomic(atomic_D_o),
 		.illegalInstruction(illegalInstruction_D_o)
 	);
 	assign funct3_D_o  		= instruction_D_i[14:12];
+	assign funct5_D_o		= instruction_D_i[31:27];
 
 	assign nextPC_D_o 		= nextPC_D_i;
 	assign PC_D_o 			= PC_D_i;
