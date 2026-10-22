@@ -3,7 +3,7 @@
   <img src="docs/assets/logo-gif.gif" alt="SARV32 Core Logo" width="900">
 </p>
 
-**SARV** is a 32-bit RISC-V processor based on the RV32I ISA. It currently supports **B**, **C**, **Zmmul**, **Zicond**, **Zicsr**, **Zicntr**, **Zihpm**, and **Zihintpause**, together with **machine**, **supervisor**, and **user** privilege modes.
+**SARV** is a 32-bit RISC-V processor based on the RV32I ISA. It currently supports the **rv32iac_sstc_zaamo_zalrsc_zba_zbb_zbc_zbkc_zbs_zca_zcb_zicntr_zicond_zicsr_zihintpause_zihpm_zmmul** ISA string, together with **machine**, **supervisor**, and **user** privilege modes.
 
 The core is written in Verilog HDL and targets FPGA and ASIC implementations. It is designed as a compact embedded processor with a modular RTL architecture.
 
