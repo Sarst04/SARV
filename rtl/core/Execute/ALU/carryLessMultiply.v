@@ -82,7 +82,7 @@ module carry_less_multiplier (
         .product(product)
     );
 
-    always @(product) begin
+    always @(product, op) begin
 		out	= 32'b0;
         case (op)
             2'b00:   out = product[31:0];              // clmul
