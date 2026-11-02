@@ -22,7 +22,7 @@ module wallace_tree (
     assign b_padded = isBSigned ? { {2{b[31]}}, b, 1'b0 } : { 2'b0, b, 1'b0 };
 
     wire signed [63:0] a_ext;
-    assign a_ext = isASigned ? $signed(a) : $signed({32'b0, a});
+    assign a_ext = isASigned ? {{32{a[31]}}, a} : $signed({32'b0, a});
 
     genvar i;
     generate

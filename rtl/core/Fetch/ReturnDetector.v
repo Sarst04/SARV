@@ -9,7 +9,7 @@ module return_detector (
 
 	input  wire [31:0]	instruction,
 
-	output wire			return
+	output wire			returnDetected
 );
 	localparam JALR = 7'b11_001_11;
 	localparam X0 	= 5'b00_000;
@@ -21,6 +21,6 @@ module return_detector (
     wire [ 4:0] rs1    	= instruction[19:15];
 
 
-	assign return	= (opcode == JALR) & ( (rs1 == X1)|(rs1 == X5) ) & (rd == X0);
+	assign returnDetected	= (opcode == JALR) & ( (rs1 == X1)|(rs1 == X5) ) & (rd == X0);
 
 endmodule

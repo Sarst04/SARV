@@ -148,8 +148,8 @@ module decompress_unit(
 
         case(opcode)
             C0: begin // Quadrant 0
-                rd_prim_rs2_prim = compressedInst[4:2] + REG_COMPRESSED_BASE;
-                rs1_prim         = compressedInst[9:7] + REG_COMPRESSED_BASE;
+                rd_prim_rs2_prim = {2'b00, compressedInst[4:2]} + REG_COMPRESSED_BASE;
+                rs1_prim         = {2'b00, compressedInst[9:7]} + REG_COMPRESSED_BASE;
 
                 case(funct3)
                     C0_ADDI4SPN: begin
@@ -253,8 +253,8 @@ module decompress_unit(
             
             C1: begin // Quadrant 1
                 rd_rs1           = compressedInst[11:7];
-                rs1_prim_rd_prim = compressedInst[9:7] + REG_COMPRESSED_BASE;
-                rs2_prim         = compressedInst[4:2] + REG_COMPRESSED_BASE;
+                rs1_prim_rd_prim = {2'b00, compressedInst[9:7]} + REG_COMPRESSED_BASE;
+                rs2_prim         = {2'b00, compressedInst[4:2]} + REG_COMPRESSED_BASE;
 
                 case(funct3)
                     C1_ADDI: begin

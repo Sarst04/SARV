@@ -67,6 +67,7 @@ module load_store_unit(
 				HALFWORDNSIGNED : begin						
 					memDataOut_M_o	= {16'b0, memDataOut_M_i[15:0]};
 				end
+				default: ;
 			endcase
 		end
 	end

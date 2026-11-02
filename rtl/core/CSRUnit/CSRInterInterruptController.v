@@ -94,6 +94,7 @@ module CSR_inter_interrupt_controller(
 			idle 			:	ns	=	irqReady			?	waitForClean	:	idle;
 			waitForClean	:	ns	=	(stageDEMWValid)  	?	waitForClean	:	raise;
 			raise			:	ns	=	idle;
+			default: ;
 		endcase
 	end
 
@@ -112,6 +113,7 @@ module CSR_inter_interrupt_controller(
 				coldDownPipe	=	1'b1;
 				raiseInterrupt	=	1'b1;
 			end
+			default: ;
 		endcase
 	end
 

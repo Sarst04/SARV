@@ -31,7 +31,7 @@ module CTZ(
 
     assign stage[0] = ~s2[0];
 
-    assign count 	= zero ? 6'd32 : {27'b0, stage};
+    assign count 	= zero ? 32'd32 : {27'b0, stage};
 
 endmodule
 
@@ -62,6 +62,6 @@ module CLZ(
 
     assign stage[0] = ~s2[1];
 
-    assign count = zero ? 6'd32 : {27'b0, stage};
+    assign count = zero ? 32'd32 : {27'b0, stage};
 
 endmodule

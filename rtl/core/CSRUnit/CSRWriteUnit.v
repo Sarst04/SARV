@@ -109,6 +109,7 @@ module CSR_write_unit(
 			Clear	: begin
 				newData = lastData & ~CSRData;
 			end
+			default: ;
 		endcase
 	end
 
@@ -157,6 +158,7 @@ module CSR_write_unit(
 
 				stimecmp		:	stimecmpEn		= 1'b1;
 				stimecmph		:	stimecmphEn		= 1'b1;
+				default: ;
 			endcase
 		end
 	end

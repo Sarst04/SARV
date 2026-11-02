@@ -88,6 +88,7 @@ module carry_less_multiplier (
             2'b00:   out = product[31:0];              // clmul
             2'b01:   out = {1'b0, product[62:32]};     // clmulh
             2'b10:   out = product[62:31];             // clmulr
+            default: ;
         endcase
     end
 

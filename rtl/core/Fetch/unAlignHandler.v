@@ -42,9 +42,9 @@ module unalign_handler(
     
     always @(posedge clk, posedge rst) begin
         if (rst)
-            ps = ALIGN;
+            ps <= ALIGN;
         else
-            ps = ns;
+            ps <= ns;
     end
     
     always @(ps, unAlignFetch_F_i, waitRequest_F_i, fullInst) begin

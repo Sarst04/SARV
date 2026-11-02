@@ -185,6 +185,7 @@ module CSR_read_unit(
 
 			stimecmp		: selectedData = stimecmpData;
 			stimecmph		: selectedData = stimecmphData;
+			default: ;
 		endcase
 	end
 endmodule

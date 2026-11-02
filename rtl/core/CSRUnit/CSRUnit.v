@@ -333,7 +333,7 @@ module CSR_unit#(
         .regOut({curPriv})
 	);
 
-	assign CSRAddr	=	(PassCSRAddr == 1'b1 ) ? funct12_C_i : 32'b0;
+	assign CSRAddr	=	(PassCSRAddr == 1'b1 ) ? funct12_C_i : 12'b0;
 	assign CSRData  =	(PassCSRData == 1'b1 ) ? ( (CSRDataSelect == 1'b0 ) ?  rs1Data_C_i  : {27'b0, uimm_C_i} ) : 32'b0;
 
 	CSR_write_unit CSRWriteUnit(

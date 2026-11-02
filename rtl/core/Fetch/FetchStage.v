@@ -54,7 +54,7 @@ module fetch_stage (
  	return_detector ReturnDetector(
 		.instruction(instruction_F_o),
 
-		.return(returnDetected_F_o)
+		.returnDetected(returnDetected_F_o)
 	);
 
 	

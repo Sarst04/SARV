@@ -42,6 +42,7 @@ module circular_buffer #(
                 2'b11: begin // Push & Pop
                     stack[sp - 1'b1] <= pushData;
                 end
+                default: ;
             endcase
         end
     end

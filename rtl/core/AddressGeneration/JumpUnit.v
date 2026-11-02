@@ -36,7 +36,7 @@ module jump_unit #(
                 PCTargetJumpUnit          = PCTarget_E_o_A_i;
             end
 			assign	topOfRas 			  = 32'b0;
-        end else begin
+        end else begin : gen_nonzero_index
 			reg			push;
 			reg		  	pop;
 			reg [30:0] 	pushData;

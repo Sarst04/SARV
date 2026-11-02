@@ -23,12 +23,13 @@ module pause_unit(
 
 	always @(posedge clk, posedge rst) begin
 		if (rst)
-			ps = 1'b0;
+			ps <= 1'b0;
 		else
-			ps = ns;
+			ps <= ns;
 	end
 	
-	always @(ps, pauseReq, carryOut) begin		ns = ps;
+	always @(ps, pauseReq, carryOut) begin
+		ns = ps;
 		case (ps)
 			ACTIVE 	: begin
 				if (pauseReq)
@@ -60,11 +61,11 @@ module pause_unit(
 
 	always @(posedge clk, posedge rst) begin
 		if (rst)
-			count 		= 	8'b0;
+			count 		<= 	8'b0;
 		else if (countEnable)
-			count 		= 	count + 1;
+			count 		<= 	count + 1;
 		else
-			count 		= 	8'b0;
+			count 		<= 	8'b0;
 	end
 
 	assign	carryOut	=	&count;

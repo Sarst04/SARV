@@ -28,6 +28,7 @@ module instruction_load_unit(
     wire [31:0] alignInstructionData;
     wire        unalign_wait;
     wire        fetchNext;
+    wire        waitRequest;
 
     unalign_handler UnalignHandler(
         .clk(clk),

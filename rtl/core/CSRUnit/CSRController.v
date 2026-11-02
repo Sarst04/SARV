@@ -89,6 +89,7 @@ module CSR_controller(
                 csrWriteIntent = (rs1Addr != REG_X0);
             CSRRCI:
                 csrWriteIntent = (rs1Addr != REG_X0);
+            default: ;
         endcase
     end
 

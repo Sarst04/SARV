@@ -273,12 +273,14 @@ module control_unit (
 							F12_CLZ		: ALUOpcode = CLZ;
 							F12_CPOP	: ALUOpcode = CPOP;
 							F12_CTZ		: ALUOpcode = CTZ;
+							default: ;
 						endcase	
 						case (funct7)
 							F7_BCLR		: ALUOpcode = BCLR;
 							F7_BINV		: ALUOpcode = BINV;
 							F7_BSET		: ALUOpcode = BSET;
 							F7_SLL		: ALUOpcode = SLL;
+							default: ;
 						endcase
 					end
                     F3_SRL, F3_SRA, F3_ROR, F3_REV8, F3_ORCB, F3_BEXT : begin
@@ -289,6 +291,7 @@ module control_unit (
 							F7_REV8	: ALUOpcode = REV8;
 							F7_ORCB	: ALUOpcode = ORCB;
 							F7_BEXT	: ALUOpcode = BEXT;
+							default: ;
 						endcase
                     end
                     default: ALUOpcode = ADD;
@@ -316,6 +319,7 @@ module control_unit (
 												mulOpCode			= funct3[1:0];
                 								writeBackSrcSelect 	= MUL_RESULT;
 										  	end
+							default: ;
 						endcase
                     end
                     F3_SLL, F3_ROL, F3_BCLR, F3_BINV, F3_BSET, F3_MULH, F3_CLMUL: begin    
@@ -331,6 +335,7 @@ module control_unit (
 												mulOpCode			= funct3[1:0];
                 								writeBackSrcSelect 	= MUL_RESULT;
 										  	end
+							default: ;
 						endcase
 					end
                     F3_SLT, F3_SH1ADD, F3_MULHSU, F3_CLMULR: begin
@@ -343,6 +348,7 @@ module control_unit (
 												mulOpCode			= funct3[1:0];
                 								writeBackSrcSelect 	= MUL_RESULT;
 										  	end
+							default: ;
 						endcase
                     end
                     F3_SLTU, F3_MULHU, F3_CLMULH    : begin
@@ -354,6 +360,7 @@ module control_unit (
 												mulOpCode			= funct3[1:0];
                 								writeBackSrcSelect 	= MUL_RESULT;
 										  	end
+							default: ;
 						endcase
 					end
                     F3_XOR, F3_SH2ADD, F3_XNOR, F3_MIN, F3_ZEXTH : begin
@@ -363,6 +370,7 @@ module control_unit (
 							F7_SH2ADD	: ALUOpcode = SH2ADD;
 							F7_MIN		: ALUOpcode = MIN;
 							F7_ZEXTH	: ALUOpcode = ZEXTH;
+							default: ;
 						endcase
                     end
                     F3_SRL, F3_SRA, F3_MINU, F3_ROR, F3_CZERO_EQZ, F3_BEXT : begin
@@ -373,6 +381,7 @@ module control_unit (
 							F7_ROR		: ALUOpcode = ROR;
 							F7_BEXT		: ALUOpcode = BEXT;
 							F7_CZERO	: ALUOpcode = CZERO_EQZ;
+							default: ;
 						endcase
                     end
                     F3_OR, F3_SH3ADD, F3_ORN, F3_MAX 	: begin
@@ -381,6 +390,7 @@ module control_unit (
 							F7_SH3ADD	: ALUOpcode = SH3ADD;
 							F7_OR		: ALUOpcode = OR;
 							F7_MAX		: ALUOpcode = MAX;
+							default: ;
 						endcase
                     end
                     F3_AND, F3_ANDN, F3_MAXU, F3_CZERO_NEZ : begin
@@ -389,6 +399,7 @@ module control_unit (
 							F7_ANDN		: ALUOpcode = ANDN;
 							F7_MAXU		: ALUOpcode = MAXU;
 							F7_CZERO	: ALUOpcode = CZERO_NEZ;
+							default: ;
 						endcase
                     end
 

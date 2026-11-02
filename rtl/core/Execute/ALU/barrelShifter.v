@@ -22,6 +22,7 @@ module barrel_shifter(
 	reg [63:0] temp;
 
 	always @(opcode, dataIn, shamt)begin
+		temp 	= 	'0;
 		dataOut	=	32'b0;
     	case (opcode)
         	BARREL_OP_SLL : dataOut = dataIn 		<< 	shamt;
@@ -35,6 +36,7 @@ module barrel_shifter(
             	temp 	= {dataIn, dataIn} 			<< 	shamt;
             	dataOut = temp[63:32];
         	end
+			default: ;
     	endcase
 	end
 endmodule

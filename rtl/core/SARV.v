@@ -310,6 +310,7 @@ module SARV_Core #(
 	wire		stallPipe_C_o;
 	wire		changeExeSrc_C_o;
 	wire		cleanPipe_C_o;
+	wire 		coldDownPipe_C_o;
 
 	// Data signal
 	wire [31:0] rs1Data_C_i;

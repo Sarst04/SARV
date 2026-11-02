@@ -46,6 +46,7 @@ module CSR_sleeping_unit (
 				if (!irq)
 					stallCore = 1'b1;
 			end
+			default: ;
 		endcase
 	end
 endmodule

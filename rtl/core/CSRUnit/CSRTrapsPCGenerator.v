@@ -49,7 +49,7 @@ module CSR_traps_pc_generator(
                 end
                 // Interrupt
                 else begin
-                    targetPC = {trapVector[31:2], 2'b00} + (interruptCause[30:0] << 2);
+                    targetPC = {trapVector[31:2], 2'b00} + ({1'b0, interruptCause[30:0]} << 2);
                 end
             end
         end

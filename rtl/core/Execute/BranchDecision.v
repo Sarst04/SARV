@@ -65,6 +65,7 @@ module branch_decision (
 					isSignedComparison = 1'b0;
 					takeBranch = gt | eq;
 				end
+				default: ;
 			endcase
 		end
 	end
