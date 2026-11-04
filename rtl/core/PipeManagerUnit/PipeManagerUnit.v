@@ -82,7 +82,7 @@ module pipe_manager_unit (
 	assign 	disablePCAdder_F_i		= coldDownPipe_C_o;
 	assign  pauseCore				= pauseCore_E_o & (~coldDownPipe_C_o);
 	assign  fullPipeStall			= stallPipe_C_o;
-	assign  disableLoadStore_M_i	= stallPipe_C_o | waitRequest_F_o;
+	assign  disableLoadStore_M_i	= stallPipe_C_o ;
 	assign  disableInstLoad_F_i		= stallPipe_C_o;
 
 	assign clear_F 					= 1'b0;
